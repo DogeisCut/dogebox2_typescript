@@ -647,6 +647,12 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 instrument.reverb = selectCurvedDistribution(1, Config.reverbRange - 1, 1, 1);
             }
 
+            if (Math.random() < 0.5) {
+                instrument.invertWave = true;
+            } else {
+                instrument.invertWave = false;
+            }
+
             function normalize(harmonics: number[]): void {
                 let max: number = 0;
                 for (const value of harmonics) {

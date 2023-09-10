@@ -446,6 +446,13 @@ export class TipPrompt implements Prompt {
 					p("The filter preserves the volume of frequencies that are below the cutoff frequency, and reduces the volume of frequencies that are above the cutoff. If this setting is used, the filter also increases the volume of frequencies that are near the cutoff."),
 				);
 			} break;
+			case "invertWave": {
+				message = div(
+					h2("Invert Wave"),
+					p("Flips the troughs and peaks of the waveform in this instrument, inverting its wave. This is for \"phase cancellation\" which is a phenominon that occurs 2 waves of the same instrument but oppisite inverts cancel out each other. "),
+					p("If this setting is used on its own and not with another instrument, you will not notice a difference, it is useless if you do not know what you are doing."),
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#
