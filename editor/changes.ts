@@ -4015,3 +4015,17 @@ export class ChangeSetEnvelopeType extends Change {
         }
     }
 }
+
+export class ChangeInvertWave extends Change {
+    constructor(doc: SongDocument, newValue: boolean) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue = instrument.invertWave;
+
+        doc.notifier.changed();
+        if (oldValue != newValue) {
+            instrument.invertWave = newValue;
+            this._didSomething();
+        }
+    }
+} 

@@ -1246,6 +1246,9 @@ export class Instrument {
     public modulators: number[] = [];
     public modFilterTypes: number[] = [];
     public invalidModulators: boolean[] = [];
+
+    public invertWave: boolean = false;
+
     constructor(isNoiseChannel: boolean, isModChannel: boolean) {
 
         if (isModChannel) {
@@ -1330,6 +1333,8 @@ export class Instrument {
         this.fadeOut = Config.fadeOutNeutral;
         this.transition = Config.transitions.dictionary["normal"].index;
         this.envelopeCount = 0;
+
+        this.invertWave = false;
         switch (type) {
             case InstrumentType.chip:
                 this.chipWave = 2;
@@ -2159,6 +2164,13 @@ export class Instrument {
                 }
 
                 this.convertLegacySettings(legacySettings, true);
+            }
+
+            if (instrumentObject["invertWave"] != undefined) {
+                this.invertWave = instrumentObject["invertWave"];
+            }
+            else {
+                this.invertWave = false;
             }
 
             for (let i: number = 0; i < Config.filterMorphCount; i++) {
