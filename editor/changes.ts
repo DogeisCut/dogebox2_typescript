@@ -900,30 +900,73 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 instrument.reverb = selectCurvedDistribution(1, Config.reverbRange - 1, 1, 1);
             }
 
-            // Configure this to whatever you'd like.
-            if (type == InstrumentType.noise || type == InstrumentType.spectrum) {
-                instrument.unison = Config.unisons.dictionary[selectWeightedRandom([
-                    { item: "none", weight: 100 },
-                    { item: "shimmer", weight: 10 },
-                    { item: "hum", weight: 8 },
-                    { item: "honky tonk", weight: 6 },
-                    { item: "dissonant", weight: 2 },
-                    { item: "fifth", weight: 4 },
-                    { item: "octave", weight: 5 },
-                    { item: "bowed", weight: 4 },
-                    { item: "piano", weight: 10 },
-                    { item: "warbled", weight: 5 },
-                    { item: "hecking gosh", weight: 3 },
-                    { item: "spinner", weight: 6 },
-                    { item: "detune", weight: 4 },
-                    { item: "rising", weight: 2 },
-                    { item: "vibrate", weight: 3 },
-                    { item: "bass", weight: 2 },
-                    { item: "recurve", weight: 3 },
-                    { item: "inject", weight: 2 },
-                    { item: "FART", weight: 1 },
-                    // { item: "custom", weight: 10 },
-                ])].index;
+            if (Math.random() < 0.5) {
+                instrument.invertWave = true;
+            } else {
+                instrument.invertWave = false;
+            }
+
+            function normalize(harmonics: number[]): void {
+                let max: number = 0;
+                for (const value of harmonics) {
+                    if (value > max) max = value;
+                }
+                for (let i: number = 0; i < harmonics.length; i++) {
+                    harmonics[i] = Config.harmonicsMax * harmonics[i] / max;
+                }
+            }
+            switch (type) {
+                case InstrumentType.noise: {
+                    instrument.chipNoise = (Math.random() * Config.chipNoises.length) | 0;
+                } break;
+                case InstrumentType.spectrum: {
+                    const spectrumGenerators: Function[] = [
+                        (): number[] => {
+                            const spectrum: number[] = [];
+                            for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
+                                spectrum[i] = (Math.random() < 0.5) ? Math.random() : 0.0;
+                            }
+                            return spectrum;
+                        },
+                        (): number[] => {
+                            let current: number = 1.0;
+                            const spectrum: number[] = [current];
+                            for (let i = 1; i < Config.spectrumControlPoints; i++) {
+                                current *= Math.pow(2, Math.random() - 0.52);
+                                spectrum[i] = current;
+                            }
+                            return spectrum;
+                        },
+                        (): number[] => {
+                            let current: number = 1.0;
+                            const spectrum: number[] = [current];
+                            for (let i = 1; i < Config.spectrumControlPoints; i++) {
+                                current *= Math.pow(2, Math.random() - 0.52);
+                                spectrum[i] = current * Math.random();
+                            }
+                            return spectrum;
+                        },
+                    ];
+                    const generator = spectrumGenerators[(Math.random() * spectrumGenerators.length) | 0];
+                    const spectrum: number[] = generator();
+                    normalize(spectrum);
+                    for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
+                        instrument.spectrumWave.spectrum[i] = Math.round(spectrum[i]);
+                    }
+                    instrument.spectrumWave.markCustomWaveDirty();
+                } break;
+                default: throw new Error("Unhandled noise instrument type in random generator.");
+            }
+        } else {
+            const type: InstrumentType = selectWeightedRandom([
+                { item: InstrumentType.chip, weight: 4 },
+                { item: InstrumentType.pwm, weight: 4 },
+                { item: InstrumentType.harmonics, weight: 5 },
+                { item: InstrumentType.pickedString, weight: 5 },
+                { item: InstrumentType.spectrum, weight: 1 },
+                { item: InstrumentType.fm, weight: 5 },
+            ]);
+            instrument.preset = instrument.type = type;
 
                 if (instrument.unison != Config.unisons.dictionary["none"].index && Math.random() > 0.4)
                 instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["unison"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
