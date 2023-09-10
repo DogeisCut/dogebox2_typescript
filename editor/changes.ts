@@ -540,6 +540,12 @@ export class ChangeRandomGeneratedInstrument extends Change {
             new PotentialFilterPoint(0.2, FilterType.peak, 0, maxFreq, 500.0, 0),
         ]);
 
+        if (Math.random() < 0.5) {
+            instrument.invertWave = true;
+        } else {
+            instrument.invertWave = false;
+        }
+
         if (isNoise) {
             const type: InstrumentType = selectWeightedRandom([
                 { item: InstrumentType.noise, weight: 1 },
@@ -645,12 +651,6 @@ export class ChangeRandomGeneratedInstrument extends Change {
             if (Math.random() < 0.5) {
                 instrument.effects |= 1 << EffectType.reverb;
                 instrument.reverb = selectCurvedDistribution(1, Config.reverbRange - 1, 1, 1);
-            }
-
-            if (Math.random() < 0.5) {
-                instrument.invertWave = true;
-            } else {
-                instrument.invertWave = false;
             }
 
             function normalize(harmonics: number[]): void {

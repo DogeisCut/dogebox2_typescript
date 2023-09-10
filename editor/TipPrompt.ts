@@ -449,8 +449,8 @@ export class TipPrompt implements Prompt {
 			case "invertWave": {
 				message = div(
 					h2("Invert Wave"),
-					p("Flips the troughs and peaks of the waveform in this instrument, inverting its wave. This is for \"phase cancellation\" which is a phenominon that occurs 2 waves of the same instrument but oppisite inverts cancel out each other. "),
-					p("If this setting is used on its own and not with another instrument, you will not notice a difference, it is useless if you do not know what you are doing."),
+					p("Flips the troughs and peaks of the waveform in this instrument, inverting its wave. This is for \"phase cancellation\" which is a phenomenon that occurs 2 waves of the same instrument but opposite inverts cancel out each other, perfect for isolating a specific sound such as reverb."),
+					p("If this setting is used on its own and not with another instrument, you will not notice a difference, it is useless if you do not know what you are doing (see: the first paragraph)."),
 				);
 			} break;
 

@@ -1703,6 +1703,8 @@ export class Instrument {
         }
         instrumentObject["envelopes"] = envelopes;
 
+        instrumentObject["invertWave"] = this.invertWave;
+
         return instrumentObject;
     }
 
@@ -2191,6 +2193,8 @@ export class Instrument {
                     this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope);
                 }
             }
+
+            this.invertWave = instrumentObject["invertWave"];
         }
     }
 
