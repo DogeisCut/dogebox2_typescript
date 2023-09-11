@@ -2754,8 +2754,7 @@ export class Instrument {
 
             if (instrumentObject["invertWave"] != undefined) {
                 this.invertWave = instrumentObject["invertWave"];
-            }
-            else {
+            } else {
                 this.invertWave = false;
             }
 
@@ -2776,7 +2775,6 @@ export class Instrument {
                 }
             }
 
-            this.invertWave = instrumentObject["invertWave"];
         }
    		 // advloop addition
             if (type === 0) {
@@ -11992,7 +11990,7 @@ export class Synth {
             prevWaveIntegralA = nextWaveIntegralA;
             prevWaveIntegralB = nextWaveIntegralB;
 
-            const inputSample: number = waveA + waveB * unisonSign * sign;
+            const inputSample: number = (waveA + waveB * unisonSign) * sign;
             const sample: number = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
             initialFilterInput2 = initialFilterInput1;
             initialFilterInput1 = inputSample;
@@ -13026,7 +13024,7 @@ export class Synth {
 		`).split("\n");
 
     private static noiseSynth(synth: Synth, bufferIndex: number, runLength: number, tone: Tone, instrumentState: InstrumentState): void {
-        const randOff: number = tone.noteStartPart / (Config.partsPerBeat * synth.song!.beatsPerBar)
+        const randOff: number = Math.abs(Math.sin((tone.noteStartPart+tone.noteEndPart+tone.pitches[0]+synth.bar)*10000)) //Makes the random noise deterministric so that invert wave works properly
         const sign: number = instrumentState.invertWave ? -1 : 1;
         const data: Float32Array = synth.tempMonoInstrumentSampleBuffer!;
         const wave: Float32Array = instrumentState.wave!;
@@ -13371,7 +13369,7 @@ export class Synth {
     }
 
     private static findRandomZeroCrossing(wave: Float32Array, waveLength: number, synth: Synth, tone: Tone): number {
-        const randOff: number = tone.noteStartPart / (Config.partsPerBeat * synth.song!.beatsPerBar)
+        const randOff: number = Math.abs(Math.sin((tone.noteStartPart+tone.noteEndPart+tone.pitches[0]+synth.bar)*10000)) //Makes the random noise deterministric so that invert wave works properly
         let phase: number = randOff * waveLength;
         const phaseMask: number = waveLength - 1;
 
