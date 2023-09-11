@@ -550,6 +550,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
             const type: InstrumentType = selectWeightedRandom([
                 { item: InstrumentType.noise, weight: 1 },
                 { item: InstrumentType.spectrum, weight: 3 },
+                { item: InstrumentType.fm, weight: 2 },
             ]);
             instrument.preset = instrument.type = type;
 
@@ -701,6 +702,131 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         instrument.spectrumWave.spectrum[i] = Math.round(spectrum[i]);
                     }
                     instrument.spectrumWave.markCustomWaveDirty();
+                } break;
+                case InstrumentType.fm: {
+                    instrument.algorithm = (Math.random() * Config.algorithms.length) | 0;
+                    instrument.feedbackType = (Math.random() * Config.feedbacks.length) | 0;
+                    const algorithm: Algorithm = Config.algorithms[instrument.algorithm];
+                    for (let i: number = 0; i < algorithm.carrierCount; i++) {
+                        instrument.operators[i].frequency = selectCurvedDistribution(0, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
+                        instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
+                            { item: "sine", weight: 3 },
+                            { item: "triangle", weight: 4 },
+                            { item: "sawtooth", weight: 10 },
+                            { item: "pulse width", weight: 4 },
+                            { item: "ramp", weight: 10 },
+                            { item: "trapezoid", weight: 6 },
+                            { item: "white noise", weight: 10 },
+                        ])].index;
+                        if (instrument.operators[i].waveform == 3/*"pulse width"*/) {
+                            instrument.operators[i].pulseWidth = selectWeightedRandom([
+                                { item: 0, weight: 3 },
+                                { item: 1, weight: 5 },
+                                { item: 2, weight: 7 },
+                                { item: 3, weight: 10 },
+                                { item: 4, weight: 15 },
+                                { item: 5, weight: 25 }, // 50%
+                                { item: 6, weight: 15 },
+                                { item: 7, weight: 10 },
+                                { item: 8, weight: 7 },
+                                { item: 9, weight: 5 },
+                                { item: 9, weight: 3 },
+                            ]);
+                        }
+                    }
+                    for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
+                        instrument.operators[i].frequency = selectCurvedDistribution(3, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].amplitude = (Math.pow(Math.random(), 2) * Config.operatorAmplitudeMax) | 0;
+                        if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
+                            instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorAmplitude"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
+                                { item: "punch", weight: 1 },
+                                { item: "flare 1", weight: 1 },
+                                { item: "flare 2", weight: 1 },
+                                { item: "flare 3", weight: 1 },
+                                { item: "twang 1", weight: 1 },
+                                { item: "twang 2", weight: 1 },
+                                { item: "twang 3", weight: 1 },
+                                { item: "swell 1", weight: 1 },
+                                { item: "swell 2", weight: 1 },
+                                { item: "swell 3", weight: 1 },
+                                { item: "tremolo1", weight: 2 },
+                                { item: "tremolo2", weight: 2 },
+                                { item: "tremolo3", weight: 2 },
+                                { item: "tremolo4", weight: 2 },
+                                { item: "tremolo5", weight: 2 },
+                                { item: "tremolo6", weight: 2 },
+                                { item: "decay 1", weight: 2 },
+                                { item: "decay 2", weight: 2 },
+                                { item: "decay 3", weight: 2 },
+                            ])].index);
+                            instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
+                                { item: "sine", weight: 3 },
+                                { item: "triangle", weight: 4 },
+                                { item: "sawtooth", weight: 10 },
+                                { item: "pulse width", weight: 4 },
+                                { item: "ramp", weight: 10 },
+                                { item: "trapezoid", weight: 6 },
+                                { item: "white noise", weight: 10 },
+                            ])].index;
+                            if (instrument.operators[i].waveform == 3) {
+                                instrument.operators[i].pulseWidth = selectWeightedRandom([
+                                    { item: 0, weight: 3 },
+                                    { item: 1, weight: 5 },
+                                    { item: 2, weight: 7 },
+                                    { item: 3, weight: 10 },
+                                    { item: 4, weight: 15 },
+                                    { item: 5, weight: 25 }, // 50%
+                                    { item: 6, weight: 15 },
+                                    { item: 7, weight: 10 },
+                                    { item: 8, weight: 7 },
+                                    { item: 9, weight: 5 },
+                                    { item: 9, weight: 3 },
+                                ]);
+                            }
+                        }
+                        if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.05) {
+                            instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorFrequency"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
+                                { item: "punch", weight: 2 },
+                                { item: "flare 1", weight: 2 },
+                                { item: "flare 2", weight: 4 },
+                                { item: "flare 3", weight: 16 },
+                                { item: "twang 1", weight: 1 },
+                                { item: "twang 2", weight: 4 },
+                                { item: "twang 3", weight: 16 },
+                                { item: "swell 1", weight: 2 },
+                                { item: "swell 2", weight: 4 },
+                                { item: "swell 3", weight: 16 },
+                                { item: "decay 1", weight: 4 },
+                                { item: "decay 2", weight: 16 },
+                                { item: "decay 3", weight: 16 },
+                            ])].index);
+                        }
+                    }
+                    instrument.feedbackAmplitude = (Math.pow(Math.random(), 3) * Config.operatorAmplitudeMax) | 0;
+                    if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
+                        instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["feedbackAmplitude"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                            { item: "punch", weight: 1 },
+                                { item: "flare 1", weight: 1 },
+                                { item: "flare 2", weight: 1 },
+                                { item: "flare 3", weight: 1 },
+                                { item: "twang 1", weight: 1 },
+                                { item: "twang 2", weight: 1 },
+                                { item: "twang 3", weight: 1 },
+                                { item: "swell 1", weight: 1 },
+                                { item: "swell 2", weight: 1 },
+                                { item: "swell 3", weight: 1 },
+                                { item: "tremolo1", weight: 2 },
+                                { item: "tremolo2", weight: 2 },
+                                { item: "tremolo3", weight: 2 },
+                                { item: "tremolo4", weight: 2 },
+                                { item: "tremolo5", weight: 2 },
+                                { item: "tremolo6", weight: 2 },
+                                { item: "decay 1", weight: 2 },
+                                { item: "decay 2", weight: 2 },
+                                { item: "decay 3", weight: 2 },
+                        ])].index);
+                    }
                 } break;
                 default: throw new Error("Unhandled noise instrument type in random generator.");
             }

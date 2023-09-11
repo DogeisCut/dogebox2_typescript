@@ -482,6 +482,22 @@ export class Config {
         { name: "13×", mult: 13.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "16×", mult: 16.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "20×", mult: 20.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        
+        { name: "-1×", mult: -1.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-~1×", mult: -1.0, hzOffset: 1.5, amplitudeSign: -1.0 },
+        { name: "-2×", mult: -2.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-~2×", mult: -2.0, hzOffset: -1.3, amplitudeSign: -1.0 },
+        { name: "-3×", mult: -3.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-4×", mult: -4.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-5×", mult: -5.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-6×", mult: -6.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-7×", mult: -7.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-8×", mult: -8.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-9×", mult: -9.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-11×", mult: -11.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-13×", mult: -13.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-16×", mult: -16.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "-20×", mult: -20.0, hzOffset: 0.0, amplitudeSign: 1.0 },
     ]);
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
@@ -620,6 +636,7 @@ export class Config {
         { name: "pulse width", samples: generateSquareWave() },
         { name: "ramp", samples: generateSawWave(true) },
         { name: "trapezoid", samples: generateTrapezoidWave(2) },
+        { name: "white noise", samples: getDrumWave(1, null, null) },
     ]);
     public static readonly pwmOperatorWaves: DictionaryArray<OperatorWave> = toNameMap([
         { name: "1%", samples: generateSquareWave(0.01) },
