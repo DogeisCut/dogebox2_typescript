@@ -83,6 +83,7 @@ export const enum EffectType {
     vibrato,
     transition,
     chord,
+    noteRange,
     // If you add more, you'll also have to extend the bitfield used in Base64 which currently uses two six-bit characters.
     length,
 }
@@ -424,8 +425,8 @@ export class Config {
         { name: "piano", voices: 2, spread: 0.01, offset: 0.0, expression: 1.0, sign: 0.7 },
         { name: "warbled", voices: 2, spread: 0.25, offset: 0.05, expression: 0.9, sign: -0.8 },
     ]);
-    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type"];
-    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb];
+    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range"];
+    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.noteRange];
     public static readonly noteSizeMax: number = 6;
     public static readonly volumeRange: number = 50;
     // Beepbox's old volume scale used factor -0.5 and was [0~7] had roughly value 6 = 0.125 power. This new value is chosen to have -21 be the same,
@@ -1033,6 +1034,9 @@ export function effectsIncludeEcho(effects: number): boolean {
 }
 export function effectsIncludeReverb(effects: number): boolean {
     return (effects & (1 << EffectType.reverb)) != 0;
+}
+export function effectsIncludeNoteRange(effects: number): boolean {
+    return (effects & (1 << EffectType.noteRange)) != 0;
 }
 export function rawChipToIntegrated(raw: DictionaryArray<ChipWave>): DictionaryArray<ChipWave> {
     const newArray: Array<ChipWave> = new Array<ChipWave>(raw.length);

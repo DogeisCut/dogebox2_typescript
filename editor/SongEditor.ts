@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
-import { InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, DropdownID } from "../synth/SynthConfig";
+import { InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeNoteRange, DropdownID } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
@@ -83,6 +83,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.fm }, EditorConfig.valueToPreset(InstrumentType.fm)!.name));
         menu.appendChild(option({ value: InstrumentType.customChipWave }, EditorConfig.valueToPreset(InstrumentType.customChipWave)!.name));
+        menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }
 
     const randomGroup: HTMLElement = optgroup({ label: "Randomize ▾" });
@@ -535,6 +536,10 @@ export class SongEditor {
     private readonly _invertWaveBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _invertWaveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("invertWave") }, "Invert Wave:"), this._invertWaveBox);
 
+    private readonly _upperNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+    private readonly _upperNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "Upper Note Limit:"), this._upperNoteLimitInputBox);
+    private readonly _lowerNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "owerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+    private readonly _lowerNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("lowerNoteLimit") }, "Lower Note Limit:"), this._lowerNoteLimitInputBox);
 
     private readonly _instrumentCopyButton: HTMLButtonElement = button({ style: "max-width:86px; width: 86px;", class: "copyButton" }, [
         "Copy",
@@ -1819,6 +1824,16 @@ export class SongEditor {
                 this._reverbRow.style.display = "none";
             }
 
+            if (effectsIncludeNoteRange(instrument.effects)) {
+                this._upperNoteLimitRow.style.display = "";
+                this._lowerNoteLimitRow.style.display = "";
+                this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
+                this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
+            } else {
+                this._upperNoteLimitRow.style.display = "none";
+                this._lowerNoteLimitRow.style.display = "none";
+            }
+
             if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
                 this._unisonSelectRow.style.display = "";
                 setSelectedValue(this._unisonSelect, instrument.unison);
@@ -2051,7 +2066,8 @@ export class SongEditor {
                             anyInstrumentPans:         boolean = false,
                             anyInstrumentChorus:       boolean = false,
                             anyInstrumentEchoes:       boolean = false,
-                            anyInstrumentReverbs:      boolean = false;
+                            anyInstrumentReverbs:      boolean = false,
+                            anyInstrumentNoteRanges:   boolean = false;
                         let allInstrumentPitchShifts:  boolean = true,
                             allInstrumentNoteFilters:  boolean = true,
                             allInstrumentDetunes:      boolean = true,
@@ -2061,7 +2077,8 @@ export class SongEditor {
                             allInstrumentPans:         boolean = true,
                             allInstrumentChorus:       boolean = true,
                             allInstrumentEchoes:       boolean = true,
-                            allInstrumentReverbs:      boolean = true;
+                            allInstrumentReverbs:      boolean = true,
+                            allInstrumentNoteRanges:      boolean = true;
                         let instrumentCandidates: number[] = [];
                         if (modInstrument >= channel.instruments.length) {
                             for (let i: number = 0; i < channel.instruments.length; i++) {
@@ -2142,6 +2159,12 @@ export class SongEditor {
                             }
                             else {
                                 allInstrumentReverbs = false;
+                            }
+                            if (effectsIncludeNoteRange(channel.instruments[instrumentIndex].effects)) {
+                                anyInstrumentNoteRanges = true;
+                            }
+                            else {
+                                allInstrumentNoteFilters = false;
                             }
 
                         }
@@ -2245,6 +2268,13 @@ export class SongEditor {
                         }
                         if (!allInstrumentReverbs) {
                             unusedSettingList.push("+ reverb");
+                        }
+
+                        if (anyInstrumentNoteRanges) {
+                            settingList.push("note range");
+                        }
+                        if (!allInstrumentNoteRanges) {
+                            unusedSettingList.push("+ note range");
                         }
 
                     }
