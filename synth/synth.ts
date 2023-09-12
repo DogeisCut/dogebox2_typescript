@@ -1251,8 +1251,8 @@ export class Instrument {
 
     public invertWave: boolean = false;
 
-    public upperNoteLimit: number = 999999;
-    public lowerNoteLimit: number = -999999;
+    public upperNoteLimit: number = Config.maxPitch;
+    public lowerNoteLimit: number = 0;
 
     constructor(isNoiseChannel: boolean, isModChannel: boolean) {
 
@@ -1339,8 +1339,8 @@ export class Instrument {
         this.transition = Config.transitions.dictionary["normal"].index;
         this.envelopeCount = 0;
 
-        this.upperNoteLimit = 99999;
-        this.lowerNoteLimit = -99999;
+        this.upperNoteLimit = Config.maxPitch;
+        this.lowerNoteLimit = 0;
 
         this.invertWave = false;
         switch (type) {
