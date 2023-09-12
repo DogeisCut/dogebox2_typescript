@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
-import { Preset, EditorConfig } from "../editor/EditorConfig";
+import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, effectsIncludeNoteRange } from "./SynthConfig";
+import { EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
 import { events } from "../global/Events";
@@ -1507,6 +1507,9 @@ export class Instrument {
 
     public invertWave: boolean = false;
 
+    public upperNoteLimit: number = 999999;
+    public lowerNoteLimit: number = -999999;
+
     constructor(isNoiseChannel: boolean, isModChannel: boolean) {
 
         // @jummbus - My screed on how modulator arrays for instruments work, for the benefit of myself in the future, or whoever else.
@@ -1612,6 +1615,9 @@ export class Instrument {
         this.fadeOut = Config.fadeOutNeutral;
         this.transition = Config.transitions.dictionary["normal"].index;
         this.envelopeCount = 0;
+
+        this.upperNoteLimit = 99999;
+        this.lowerNoteLimit = -99999;
 
         this.invertWave = false;
         switch (type) {
@@ -1927,6 +1933,10 @@ export class Instrument {
         }
         if (effectsIncludeReverb(this.effects)) {
             instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
+        }
+        if (effectsIncludeNoteRange(this.effects)) {
+            instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
+            instrumentObject["lowerNoteLimit"] = this.lowerNoteLimit;
         }
 
         if (this.type != InstrumentType.drumset) {
@@ -2365,6 +2375,13 @@ export class Instrument {
             this.reverb = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverb"] | 0) / 100));
         } else {
             this.reverb = legacyGlobalReverb;
+        }
+
+        if (instrumentObject["upperNoteLimit"] != undefined) {
+            this.upperNoteLimit = instrumentObject["upperNoteLimit"]
+        }
+        if (instrumentObject["lowerNoteLimit"] != undefined) {
+            this.upperNoteLimit = instrumentObject["lowerNoteLimit"]
         }
 
         if (instrumentObject["pulseWidth"] != undefined) {
@@ -3243,7 +3260,15 @@ export class Song {
                 }
 
                 // The list of enabled effects is represented as a 12-bit bitfield using two six-bit characters.
-                buffer.push(SongTagCode.effects, base64IntToCharCode[instrument.effects >> 6], base64IntToCharCode[instrument.effects & 63]);
+                buffer.push(
+                    SongTagCode.effects,
+                    base64IntToCharCode[(instrument.effects >>> (6 * 5)) & 63],
+                    base64IntToCharCode[(instrument.effects >>> (6 * 4)) & 63],
+                    base64IntToCharCode[(instrument.effects >>> (6 * 3)) & 63],
+                    base64IntToCharCode[(instrument.effects >>> (6 * 2)) & 63],
+                    base64IntToCharCode[(instrument.effects >>> (6 * 1)) & 63],
+                    base64IntToCharCode[(instrument.effects >>> (6 * 0)) & 63]
+                );
                 if (effectsIncludeNoteFilter(instrument.effects)) {
                     buffer.push(base64IntToCharCode[+instrument.noteFilterType]);
                     if (instrument.noteFilterType) {
@@ -3330,6 +3355,10 @@ export class Song {
                 }
                 if (effectsIncludeReverb(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.reverb]);
+                }
+
+                if (effectsIncludeNoteRange(instrument.effects)) {
+                    buffer.push(base64IntToCharCode[instrument.upperNoteLimit], base64IntToCharCode[instrument.lowerNoteLimit]);
                 }
 
                 if (instrument.type != InstrumentType.drumset) {
@@ -4871,9 +4900,16 @@ export class Song {
                     const legacySettings: LegacySettings = legacySettingsCache![instrumentChannelIterator][instrumentIndexIterator];
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 } else {
-                    // BeepBox currently uses two base64 characters at 6 bits each for a bitfield representing all the enabled effects.
-                    if (EffectType.length > 12) throw new Error();
-                    instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    // BeepBox currently uses six base64 characters at 6 bits each for a bitfield representing all the enabled effects.
+                    if (EffectType.length > 32) throw new Error();
+                    instrument.effects = (
+                        (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 5))
+                        | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 4))
+                        | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 3))
+                        | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 2))
+                        | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 1))
+                        | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 0))
+                        ) >>> 0;
 
                     if (effectsIncludeNoteFilter(instrument.effects)) {
                         let typeCheck: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -5011,6 +5047,10 @@ export class Song {
                         } else {
                             instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         }
+                    }
+                    if (effectsIncludeNoteRange(instrument.effects)) {
+                        instrument.upperNoteLimit = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.lowerNoteLimit = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     }
                 }
                 // Clamp the range.
