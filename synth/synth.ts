@@ -2717,7 +2717,8 @@ export class Song {
                 }
 
                 if (effectsIncludeNoteRange(instrument.effects)) {
-                    buffer.push(base64IntToCharCode[instrument.upperNoteLimit], base64IntToCharCode[instrument.lowerNoteLimit]);
+                    buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 0x3f]);
+                    buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 0x3f]);
                 }
 
                 if (instrument.type != InstrumentType.drumset) {
@@ -3980,8 +3981,8 @@ export class Song {
                         }
                     }
                     if (effectsIncludeNoteRange(instrument.effects)) {
-                        instrument.upperNoteLimit = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                        instrument.lowerNoteLimit = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     }
                 }
                 // Clamp the range.
