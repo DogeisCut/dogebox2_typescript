@@ -453,6 +453,18 @@ export class TipPrompt implements Prompt {
 					p("If this setting is used on its own and not with another instrument, you will not notice a difference, it is useless if you do not know what you are doing (see: the first paragraph)."),
 				);
 			} break;
+			case "upperNoteLimit": {
+				message = div(
+					h2("Upper Note Limit"),
+					p("Defines the upper limit in which notes will play, useful for advanced instruments."),
+				);
+			} break;
+			case "lowerNoteLimit": {
+				message = div(
+					h2("Lower Note Limit"),
+					p("Defines the lower limit in which notes will play, useful for advanced instruments."),
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#
