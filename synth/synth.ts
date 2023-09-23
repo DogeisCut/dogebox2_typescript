@@ -7948,7 +7948,8 @@ export class Synth {
                         tonesInNextNote = chord.singleTone ? 1 : nextNoteForThisInstrument.pitches.length
                     }
 
-                    if (chord.singleTone) {
+                    let filteredPitches: number[] = note.pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit)
+                    if (chord.singleTone && !(filteredPitches.length <= 0)) {
                         const atNoteStart: boolean = (Config.ticksPerPart * note.start == currentTick);
                         let tone: Tone;
                         if (toneList.count() <= toneCount) {
@@ -7967,11 +7968,11 @@ export class Synth {
                             tone = toneList.get(toneCount);
                         }
                         toneCount++;
-
-                        for (let i: number = 0; i < note.pitches.length; i++) {
-                            tone.pitches[i] = note.pitches[i];
+                        
+                        for (let i: number = 0; i < filteredPitches.length; i++) {
+                            tone.pitches[i] = filteredPitches[i];
                         }
-                        tone.pitchCount = note.pitches.length;
+                        tone.pitchCount = filteredPitches.length;
                         tone.chordSize = 1;
                         tone.instrumentIndex = instrumentIndex;
                         tone.note = note;
