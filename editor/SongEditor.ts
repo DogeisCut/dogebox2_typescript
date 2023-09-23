@@ -46,7 +46,7 @@ import { SpectrumEditor } from "./SpectrumEditor";
 import { CustomPrompt } from "./CustomPrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeInvertWave } from "./changes";
+import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeInvertWave, ChangeLowerLimit, ChangeUpperLimit } from "./changes";
 
 import { TrackEditor } from "./TrackEditor";
 import { oscilascopeCanvas } from "../global/Oscilascope";
@@ -1695,6 +1695,10 @@ export class SongEditor {
 
         this._invertWaveBox.addEventListener("input", () => { this._doc.record(new ChangeInvertWave(this._doc, this._invertWaveBox.checked)) });
 
+        this._upperNoteLimitInputBox.addEventListener("input", () => { this._doc.record(new ChangeUpperLimit(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].upperNoteLimit, (+this._upperNoteLimitInputBox.value))) });
+        this._lowerNoteLimitInputBox.addEventListener("input", () => { this._doc.record(new ChangeLowerLimit(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].lowerNoteLimit, (+this._lowerNoteLimitInputBox.value))) });
+        
+
         this._promptContainer.addEventListener("click", (event) => {
             if (this._doc.prefs.closePromptByClickoff === true) {
                 if (this.prompt != null && this.prompt.gotMouseUp === true) return;
@@ -2840,6 +2844,18 @@ export class SongEditor {
             this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
 
 
+            this._upperNoteLimitRow.firstChild!.textContent = "Upper Note Limit [" + Piano.getPitchNameAlwaysOctave(
+                (instrument.upperNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave,
+                instrument.upperNoteLimit,
+                0) 
+                + "]:"
+            this._lowerNoteLimitRow.firstChild!.textContent = "Lower Note Limit [" + Piano.getPitchNameAlwaysOctave(
+                (instrument.lowerNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave,
+                instrument.lowerNoteLimit,
+                0)
+                 + "]:"
+            
+
             if (instrument.type == InstrumentType.customChipWave) {
                 this._customWaveDrawCanvas.redrawCanvas();
                 if (this.prompt instanceof CustomChipPrompt) {
@@ -2916,6 +2932,8 @@ export class SongEditor {
 
             this._modulatorGroup.style.display = "";
             this._modulatorGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
+
+            
 
             for (let mod: number = 0; mod < Config.modCount; mod++) {
 

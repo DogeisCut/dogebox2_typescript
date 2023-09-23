@@ -2381,7 +2381,7 @@ export class Instrument {
             this.upperNoteLimit = instrumentObject["upperNoteLimit"]
         }
         if (instrumentObject["lowerNoteLimit"] != undefined) {
-            this.upperNoteLimit = instrumentObject["lowerNoteLimit"]
+            this.lowerNoteLimit = instrumentObject["lowerNoteLimit"]
         }
 
         if (instrumentObject["pulseWidth"] != undefined) {
@@ -10426,6 +10426,7 @@ export class Synth {
     }
 
     private computeTone(song: Song, channelIndex: number, samplesPerTick: number, tone: Tone, released: boolean, shouldFadeOutFast: boolean): void {
+        
         const roundedSamplesPerTick: number = Math.ceil(samplesPerTick);
         const channel: Channel = song.channels[channelIndex];
         const channelState: ChannelState = this.channels[channelIndex];
@@ -10451,6 +10452,8 @@ export class Synth {
 
         let specialIntervalMult: number = 1.0;
         tone.specialIntervalExpressionMult = 1.0;
+
+
 
         //if (synth.isModActive(ModSetting.mstPan, channelIndex, tone.instrumentIndex)) {
         //    startPan = synth.getModValue(ModSetting.mstPan, false, channel, instrumentIdx, false);
