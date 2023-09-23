@@ -9805,8 +9805,12 @@ export class Synth {
             const instrumentState: InstrumentState = channelState.instruments[instrumentIndex];
             const toneList: Deque<Tone> = instrumentState.liveInputTones;
             let toneCount: number = 0;
-            if (this.liveInputDuration > 0 && (channelIndex == this.liveInputChannel) && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
-                const instrument: Instrument = channel.instruments[instrumentIndex];
+
+            const instrument: Instrument = channel.instruments[instrumentIndex];
+            const filteredPitches = pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit)
+
+            if (this.liveInputDuration > 0 && channelIndex == this.liveInputChannel && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
+                
 
                 if (instrument.getChord().singleTone) {
                     let tone: Tone;
@@ -9822,10 +9826,10 @@ export class Synth {
                     }
                     toneCount++;
 
-                    for (let i: number = 0; i < pitches.length; i++) {
-                        tone.pitches[i] = pitches[i];
+                    for (let i: number = 0; i < filteredPitches.length; i++) {
+                        tone.pitches[i] = filteredPitches[i];
                     }
-                    tone.pitchCount = pitches.length;
+                    tone.pitchCount = filteredPitches.length;
                     tone.chordSize = 1;
                     tone.instrumentIndex = instrumentIndex;
                     tone.note = tone.prevNote = tone.nextNote = null;
@@ -9836,16 +9840,16 @@ export class Synth {
                 } else {
                     //const transition: Transition = instrument.getTransition();
 
-                    this.moveTonesIntoOrderedTempMatchedList(toneList, pitches);
+                    this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
 
-                    for (let i: number = 0; i < pitches.length; i++) {
+                    for (let i: number = 0; i < filteredPitches.length; i++) {
                         //const strumOffsetParts: number = i * instrument.getChord().strumParts;
 
                         let tone: Tone;
                         if (this.tempMatchedPitchTones[toneCount] != null) {
                             tone = this.tempMatchedPitchTones[toneCount]!;
                             this.tempMatchedPitchTones[toneCount] = null;
-                            if (tone.pitchCount != 1 || tone.pitches[0] != pitches[i]) {
+                            if (tone.pitchCount != 1 || tone.pitches[0] != filteredPitches[i]) {
                                 this.releaseTone(instrumentState, tone);
                                 tone = this.newTone();
                             }
@@ -9856,9 +9860,9 @@ export class Synth {
                         }
                         toneCount++;
 
-                        tone.pitches[0] = pitches[i];
+                        tone.pitches[0] = filteredPitches[i];
                         tone.pitchCount = 1;
-                        tone.chordSize = pitches.length;
+                        tone.chordSize = filteredPitches.length;
                         tone.instrumentIndex = instrumentIndex;
                         tone.note = tone.prevNote = tone.nextNote = null;
                         tone.atNoteStart = this.liveInputStarted;
@@ -10272,11 +10276,11 @@ export class Synth {
                         const transition: Transition = instrument.getTransition();
 
                         if (((transition.isSeamless && !transition.slides && chord.strumParts == 0) || forceContinueAtStart) && (Config.ticksPerPart * note.start == currentTick) && prevNoteForThisInstrument != null) {
-                            this.moveTonesIntoOrderedTempMatchedList(toneList, note.pitches);
+                            this.moveTonesIntoOrderedTempMatchedList(toneList, filteredPitches);
                         }
 
                         let strumOffsetParts: number = 0;
-                        for (let i: number = 0; i < note.pitches.length; i++) {
+                        for (let i: number = 0; i < filteredPitches.length; i++) {
 
                             let prevNoteForThisTone: Note | null = (tonesInPrevNote > i) ? prevNoteForThisInstrument : null;
                             let noteForThisTone: Note = note;
