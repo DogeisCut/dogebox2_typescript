@@ -557,6 +557,21 @@ export class SongEditor {
         ]),
     ]);
 
+    private readonly _instrumentExportButton: HTMLButtonElement = button({ style: "max-width:86px; width: 86px;", class: "exportInstrumentButton" }, [
+        "Export",
+        // Export icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 -960 960 960" }, [
+            SVG.path({ d: "M200-120v-40h560v40H200Zm279.231-150.769L254.615-568.462h130.769V-840h188.462v271.538h130.77L479.231-270.769Zm0-65.385 142.923-191.538h-88.308V-800H425.385v272.308h-88.308l142.154 191.538ZM480-527.692Z", fill: "currentColor" }),
+        ]),
+    ]);
+    private readonly _instrumentImportButton: HTMLButtonElement = button({ style: "max-width:86px;", class: "importInstrumentButton" }, [
+        "Import",
+        // Import icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 -960 960 960" }, [
+            SVG.path({ d: "M200-120v-40h560v40H200Zm185.384-150.769v-271.539H254.615L480-840l224.616 297.692h-130.77v271.539H385.384Zm40.001-40h108.461v-272.308h88.308L480-774.615 337.077-583.077h88.308v272.308ZM480-583.077Z", fill: "currentColor"}),
+        ]),
+    ]);
+
     private readonly _customWaveDrawCanvas: CustomChipCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray: Float32Array) => new ChangeCustomWave(this._doc, newArray));
     private readonly _customWavePresetDrop: HTMLSelectElement = buildHeaderedOptions("Load Preset", select({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }),
         Config.chipWaves.map(wave => wave.name)
@@ -640,6 +655,12 @@ export class SongEditor {
         div({ class: "selectRow" },
             this._instrumentCopyButton,
             this._instrumentPasteButton,
+        ),
+    );
+    private readonly _instrumentExportGroup: HTMLDivElement = div({ class: "editor-controls" },
+        div({ class: "selectRow" },
+            this._instrumentExportButton,
+            this._instrumentImportButton,
         ),
     );
     private readonly _instrumentSettingsTextRow: HTMLDivElement = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` },
@@ -1064,6 +1085,8 @@ export class SongEditor {
         this.mainLayer.addEventListener("focusin", this._onFocusIn);
         this._instrumentCopyButton.addEventListener("click", this._copyInstrument.bind(this));
         this._instrumentPasteButton.addEventListener("click", this._pasteInstrument.bind(this));
+        this._instrumentExportButton.addEventListener("click", this._exportInstrument.bind(this));
+        this._instrumentImportButton.addEventListener("click", this._importInstrument.bind(this));
 
         this._instrumentVolumeSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangeVolume(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(25.0, Math.max(-25.0, Math.round(+this._instrumentVolumeSliderInputBox.value))))) });
         this._panSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangePan(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].pan, Math.min(100.0, Math.max(0.0, Math.round(+this._panSliderInputBox.value))))) });
@@ -1552,6 +1575,7 @@ export class SongEditor {
             this._instrumentVolumeSliderRow.style.display = "";
             this._instrumentTypeSelectRow.style.setProperty("display", "");
             this._instrumentSettingsGroup.appendChild(this._instrumentCopyGroup);
+            this._instrumentSettingsGroup.appendChild(this._instrumentExportGroup);
             this._instrumentSettingsGroup.insertBefore(this._instrumentsButtonRow, this._instrumentSettingsGroup.firstChild);
             this._instrumentSettingsGroup.insertBefore(this._instrumentSettingsTextRow, this._instrumentSettingsGroup.firstChild);
 
@@ -1925,6 +1949,7 @@ export class SongEditor {
             $("#pitchPresetSelect").parent().hide();
             $("#drumPresetSelect").parent().hide();
             this._modulatorGroup.appendChild(this._instrumentCopyGroup);
+            this._modulatorGroup.appendChild(this._instrumentExportGroup);
 
             this._modulatorGroup.insertBefore(this._instrumentsButtonRow, this._modulatorGroup.firstChild);
             this._modulatorGroup.insertBefore(this._instrumentSettingsTextRow, this._modulatorGroup.firstChild);
@@ -3434,6 +3459,65 @@ export class SongEditor {
         }
         this.refocusStage();
     }
+
+    private _exportInstrument = (): void => {
+        const channel: Channel = this._doc.song.channels[this._doc.channel];
+        const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
+        const instrumentCopy: any = instrument.toJsonObject();
+        instrumentCopy["isDrum"] = this._doc.song.getChannelIsNoise(this._doc.channel);
+    
+        const jsonBlob = new Blob([JSON.stringify(instrumentCopy)], { type: 'application/json' });
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(jsonBlob);
+        downloadLink.download = 'instrument.json';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    
+        this.refocusStage();
+    }
+
+    private _importInstrument = (): void => {
+        // Create a hidden file input element
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.style.display = 'none';
+    
+        // Add an event listener for when a file is selected
+        fileInput.addEventListener('change', (event) => {
+            const files = (event.target as HTMLInputElement).files;
+    
+            if (files && files.length > 0) {
+                const reader = new FileReader();
+    
+                reader.onload = (e) => {
+                    try {
+                        const instrumentCopy: any = JSON.parse(String(e.target?.result));
+                        const channel: Channel = this._doc.song.channels[this._doc.channel];
+                        const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
+    
+                        if (instrumentCopy != null && instrumentCopy["isDrum"] == this._doc.song.getChannelIsNoise(this._doc.channel)) {
+                            this._doc.record(new ChangePasteInstrument(this._doc, instrument, instrumentCopy));
+                        }
+    
+                        this.refocusStage();
+                    } catch (error) {
+                        console.error('Error reading file:', error);
+                    }
+                };
+    
+                reader.readAsText(files[0]);
+    
+                // Remove the temporary file input element
+                document.body.removeChild(fileInput);
+            }
+        });
+    
+        // Trigger the click event to open the file dialog
+        document.body.appendChild(fileInput);
+        fileInput.click();
+    };
 
     private _switchEQFilterType(toSimple: boolean) {
         const channel: Channel = this._doc.song.channels[this._doc.channel];
