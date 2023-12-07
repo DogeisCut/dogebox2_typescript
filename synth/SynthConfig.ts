@@ -53,11 +53,7 @@ export const enum EnvelopeType {
 	tremolo,
 	tremolo2,
     decay,
-    wibble,
-    hard,
-    linear,
-    rise,
-    blip
+    clap
 }
 
 export const enum InstrumentType {
@@ -1139,7 +1135,7 @@ export class Config {
         { name: "octave", voices: 2, spread: 6.0, offset: 6.0, expression: 0.8, sign: 1.0 },
         { name: "bowed", voices: 2, spread: 0.02, offset: 0.0, expression: 1.0, sign: -1.0 },
         { name: "piano", voices: 2, spread: 0.01, offset: 0.0, expression: 1.0, sign: 0.7 },
-        { name: "warbled", voices: 2, spread: 0.25, offset: 0.05, expression: 0.9, sign: -0.8 },
+        { name: "warbled", voices: 2, spread: 0.25, offset: 0.05, expression: 0.9, sign: -0.8 }
     ]);
     public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "invert wave"];
     public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.noteRange, EffectType.invertWave];
@@ -1305,45 +1301,7 @@ export class Config {
         { name: "decay 1", type: EnvelopeType.decay, speed: 10.0 },
         { name: "decay 2", type: EnvelopeType.decay, speed: 7.0 },
         { name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
-        { name: "wibble-1", type: EnvelopeType.wibble, speed: 96.0 },
-        { name: "wibble 1", type: EnvelopeType.wibble, speed: 24.0 },
-        { name: "wibble 2", type: EnvelopeType.wibble, speed: 12.0 },
-        { name: "wibble 3", type: EnvelopeType.wibble, speed: 4.0 },
-        { name: "linear-2", type: EnvelopeType.linear, speed: 256.0 },
-        { name: "linear-1", type: EnvelopeType.linear, speed: 128.0 },
-        { name: "linear 1", type: EnvelopeType.linear, speed: 32.0 },
-        { name: "linear 2", type: EnvelopeType.linear, speed: 8.0 },
-        { name: "linear 3", type: EnvelopeType.linear, speed: 2.0 },
-        { name: "rise -2", type: EnvelopeType.rise, speed: 256.0 },
-        { name: "rise -1", type: EnvelopeType.rise, speed: 128.0 },
-        { name: "rise 1", type: EnvelopeType.rise, speed: 32.0 },
-        { name: "rise 2", type: EnvelopeType.rise, speed: 8.0 },
-        { name: "rise 3", type: EnvelopeType.rise, speed: 2.0 },
-	    		//modbox
-        { name: "flute 1", type: 9, speed: 16.0 },
-		{ name: "flute 2", type: 9, speed: 8.0 },
-		{ name: "flute 3", type: 9, speed: 4.0 },
-        // sandbox
-		{ name: "tripolo1", type: 6, speed: 9.0 },
-        { name: "tripolo2", type: 6, speed: 6.0 },
-        { name: "tripolo3", type: 6, speed: 3.0 },
-        { name: "tripolo4", type: 7, speed: 9.0 },
-        { name: "tripolo5", type: 7, speed: 6.0 },
-        { name: "tripolo6", type: 7, speed: 3.0 },
-        { name: "pentolo1", type: 6, speed: 10.0 },
-        { name: "pentolo2", type: 6, speed: 5.0 },
-        { name: "pentolo3", type: 6, speed: 2.5 },
-        { name: "pentolo4", type: 7, speed: 10.0 },
-        { name: "pentolo5", type: 7, speed: 5.0 },
-        { name: "pentolo6", type: 7, speed: 2.5 },	
-        // todbox
-	    { name: "flutter 1", type: 6, speed: 14.0 },
-        { name: "flutter 2", type: 7, speed: 11.0 },
-        { name: "water-y flutter", type: 6, speed: 9.0 },
-	    // new jummbox
-        { name: "blip 1", type: EnvelopeType.blip, speed: 6.0 },
-        { name: "blip 2", type: EnvelopeType.blip, speed: 16.0 },
-        { name: "blip 3", type: EnvelopeType.blip, speed: 32.0 },
+        { name: "clap", type: EnvelopeType.clap, speed: 1.0 },
     ]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },
@@ -1425,9 +1383,9 @@ export class Config {
     public static readonly pitchChannelCountMin: number = 1;
     public static readonly pitchChannelCountMax: number = 40;
     public static readonly noiseChannelCountMin: number = 0;
-    public static readonly noiseChannelCountMax: number = 16;
+    public static readonly noiseChannelCountMax: number = 32;
     public static readonly modChannelCountMin: number = 0;
-    public static readonly modChannelCountMax: number = 12;
+    public static readonly modChannelCountMax: number = 24;
     public static readonly noiseInterval: number = 6;
     public static readonly pitchesPerOctave: number = 12; // TODO: Use this for converting pitch to frequency.
     public static readonly drumCount: number = 12;
