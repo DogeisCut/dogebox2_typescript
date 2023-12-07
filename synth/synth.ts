@@ -8212,7 +8212,7 @@ export class Synth {
             baseExpression = Config.drumsetBaseExpression;
             expressionReferencePitch = basePitch;
         } else if (instrument.type == InstrumentType.noise) {
-            basePitch = Config.chipNoises[instrument.chipNoise].basePitch;
+            basePitch = isNoiseChannel ? Config.chipNoises[instrument.chipNoise].basePitch : basePitch + Config.chipNoises[instrument.chipNoise].basePitch - 12;
             baseExpression = Config.noiseBaseExpression;
             expressionReferencePitch = basePitch;
             pitchDamping = Config.chipNoises[instrument.chipNoise].isSoft ? 24.0 : 60.0;
@@ -8597,6 +8597,8 @@ export class Synth {
             let sineExpressionBoost: number = 1.0;
             let totalCarrierExpression: number = 0.0;
 
+            let trueBasePitch: number = isNoiseChannel ? 12 : basePitch
+
             let arpeggioInterval: number = 0;
             const arpeggiates: boolean = chord.arpeggiates;
             if (tone.pitchCount > 1 && arpeggiates) {
@@ -8611,8 +8613,8 @@ export class Synth {
                 const pitch: number = tone.pitches[arpeggiates ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))];
                 const freqMult = Config.operatorFrequencies[instrument.operators[i].frequency].mult;
                 const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
-                const pitchStart: number = basePitch + (pitch + intervalStart) * intervalScale + interval;
-                const pitchEnd: number = basePitch + (pitch + intervalEnd) * intervalScale + interval;
+                const pitchStart: number = trueBasePitch + (pitch + intervalStart) * intervalScale + interval;
+                const pitchEnd: number = trueBasePitch + (pitch + intervalEnd) * intervalScale + interval;
                 const baseFreqStart: number = Instrument.frequencyFromPitch(pitchStart);
                 const baseFreqEnd: number = Instrument.frequencyFromPitch(pitchEnd);
                 const hzOffset: number = Config.operatorFrequencies[instrument.operators[i].frequency].hzOffset;
