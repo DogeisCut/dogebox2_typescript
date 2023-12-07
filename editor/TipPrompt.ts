@@ -108,7 +108,7 @@ export class TipPrompt implements Prompt {
 			case "instrumentType": {
 				message = div(
 					h2("Instrument Type"),
-					p("JummBox comes with many instrument presets, try them out! You can also create your own custom instruments!"),
+					p("Dogebox2 comes with many instrument presets, try them out! You can also create your own custom instruments!"),
 					p("There are also options for copying and pasting instrument settings and for generating random instruments at the top of the instrument type menu."),
 				);
 			} break;
@@ -149,13 +149,13 @@ export class TipPrompt implements Prompt {
 			case "chipWave": {
 				message = div(
 					h2("Chip Wave"),
-					p("JummBox comes with some sound waves based on classic electronic sound chips, as well as several unique waves. This is the basic source of the sound of the instrument, which is modified by the other instrument settings."),
+					p("Dogebox2 comes with some sound waves based on classic electronic sound chips, as well as several unique waves. This is the basic source of the sound of the instrument, which is modified by the other instrument settings."),
 				);
 			} break;
 			case "chipNoise": {
 				message = div(
 					h2("Noise"),
-					p("JummBox comes with several basic noise sounds. These do not have any distinct musical pitch, and can be used like drums to create beats and emphasize your song's rhythm."),
+					p("Dogebox2 comes with several basic noise sounds. These do not have any distinct musical pitch, and can be used like drums to create beats and emphasize your song's rhythm."),
 				);
 			} break;
 			case "pulseWidth": {
@@ -174,9 +174,9 @@ export class TipPrompt implements Prompt {
 			case "chords": {
 				message = div(
 					h2("Chords"),
-					p("When multiple different notes occur at the same time, this is called a chord. Chords can be created in JummBox's pattern editor by adding notes above or below another note."),
+					p("When multiple different notes occur at the same time, this is called a chord. Chords can be created in Dogebox2's pattern editor by adding notes above or below another note."),
 					p("This setting determines how chords are played. The standard option is \"simultaneous\" which starts playing all of the pitches in a chord at the same instant. The \"strum\" option is similar, but plays the notes starting at slightly different times. The \"arpeggio\" option is used in \"chiptune\" style music and plays a single tone that rapidly alternates between all of the pitches in the chord."),
-					p("Some JummBox instruments have an option called \"custom interval\" which uses the chord notes to control the interval between the waves of a single tone. This can create strange sound effects when combined with FM modulators."),
+					p("Some Dogebox2 instruments have an option called \"custom interval\" which uses the chord notes to control the interval between the waves of a single tone. This can create strange sound effects when combined with FM modulators."),
 				);
 			} break;
 			case "vibrato": {
@@ -412,7 +412,7 @@ export class TipPrompt implements Prompt {
 			case "aliases": {
 				message = div(
 					h2("Aliasing"),
-					p("JummBox applies a technique called 'anti-aliasing' to instruments normally to help them sound cleaner even at high frequencies and low sample rates."),
+					p("Dogebox2 applies a technique called 'anti-aliasing' to instruments normally to help them sound cleaner even at high frequencies and low sample rates."),
 					p("When this setting is ticked that technique is disabled, so you may hear strange audio artifacts especially at high pitches and when bending notes. However, this can lend a grungy sound to an instrument that could be desirable."),
 				);
 			} break;
@@ -435,7 +435,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Low-Pass Filter Cutoff Frequency"),
 					p("The lowest setting feels \"muffled\" or \"dark\", and the highest setting feels \"harsh\" or \"bright\"."),
-					p("Most sounds include a range of frequencies from low to high. JummBox instruments have a filter that allows the lowest frequencies to pass through at full volume, but can reduce the volume of the higher frequencies that are above a cutoff frequency. This setting controls the cutoff frequency and thus the range of higher frequencies that are reduced."),
+					p("Most sounds include a range of frequencies from low to high. Dogebox2 instruments have a filter that allows the lowest frequencies to pass through at full volume, but can reduce the volume of the higher frequencies that are above a cutoff frequency. This setting controls the cutoff frequency and thus the range of higher frequencies that are reduced."),
 					p("This cutoff setting also determines which frequency resonates when the resonance peak setting is used."),
 				);
 			} break;

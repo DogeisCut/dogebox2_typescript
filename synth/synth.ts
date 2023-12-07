@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, effectsIncludeNoteRange } from "./SynthConfig";
+import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, effectsIncludeNoteRange, effectsIncludeInvertWave } from "./SynthConfig";
 import { EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -161,8 +161,6 @@ const enum SongTagCode {
     feedbackEnvelope = CharCode.V, // added in 6, DEPRECATED
     pulseWidth = CharCode.W, // added in 7
     aliases = CharCode.X, // [JB], added in 4, DEPRECATED
-
-    invertWave = CharCode.Y
 
 }
 
@@ -1627,6 +1625,9 @@ export class Instrument {
             instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
             instrumentObject["lowerNoteLimit"] = this.lowerNoteLimit;
         }
+        if (effectsIncludeInvertWave(this.effects)) {
+            instrumentObject["invertWave"] = this.invertWave;
+        }
 
         if (this.type != InstrumentType.drumset) {
             instrumentObject["fadeInSeconds"] = Math.round(10000 * Synth.fadeInSettingToSeconds(this.fadeIn)) / 10000;
@@ -1712,8 +1713,6 @@ export class Instrument {
             envelopes.push(this.envelopes[i].toJsonObject());
         }
         instrumentObject["envelopes"] = envelopes;
-
-        instrumentObject["invertWave"] = this.invertWave;
 
         return instrumentObject;
     }
@@ -1929,6 +1928,12 @@ export class Instrument {
         }
         if (instrumentObject["lowerNoteLimit"] != undefined) {
             this.lowerNoteLimit = instrumentObject["lowerNoteLimit"]
+        }
+
+        if (instrumentObject["invertWave"] != undefined) {
+            this.invertWave = instrumentObject["invertWave"];
+        } else {
+            this.invertWave = false;
         }
 
         if (instrumentObject["pulseWidth"] != undefined) {
@@ -2185,12 +2190,6 @@ export class Instrument {
                 }
 
                 this.convertLegacySettings(legacySettings, true);
-            }
-
-            if (instrumentObject["invertWave"] != undefined) {
-                this.invertWave = instrumentObject["invertWave"];
-            } else {
-                this.invertWave = false;
             }
 
             for (let i: number = 0; i < Config.filterMorphCount; i++) {
@@ -2721,6 +2720,10 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.lowerNoteLimit >> 6], base64IntToCharCode[instrument.lowerNoteLimit & 0x3f]);
                 }
 
+                if (effectsIncludeInvertWave(instrument.effects)) {
+                    buffer.push(base64IntToCharCode[+instrument.invertWave]);
+                }
+
                 if (instrument.type != InstrumentType.drumset) {
                     buffer.push(SongTagCode.fadeInOut, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
                     // Transition info follows transition song tag
@@ -2813,8 +2816,6 @@ export class Song {
                     }
                     buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].envelope]);
                 }
-
-                buffer.push(SongTagCode.invertWave, base64IntToCharCode[+instrument.invertWave]);
             }
         }
 
@@ -3408,7 +3409,7 @@ export class Song {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, legacyWaves[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]] | 0);
                     }
                 } else {
-                    if (instrumentChannelIterator >= this.pitchChannelCount) {
+                    if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type == InstrumentType.noise) {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipNoise = clamp(0, Config.chipNoises.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     } else {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -3573,9 +3574,6 @@ export class Song {
             case SongTagCode.stringSustain: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 instrument.stringSustain = clamp(0, Config.stringSustainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-            } break;
-            case SongTagCode.invertWave: {
-                this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].invertWave = Boolean(base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
             } break;
             case SongTagCode.fadeInOut: {
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox)) {
@@ -3983,6 +3981,10 @@ export class Song {
                     if (effectsIncludeNoteRange(instrument.effects)) {
                         instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    }
+
+                    if (effectsIncludeInvertWave(instrument.effects)) {
+                        instrument.invertWave = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false);
                     }
                 }
                 // Clamp the range.
