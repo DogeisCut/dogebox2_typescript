@@ -23,7 +23,7 @@ export function prettyNumber(value: number): string {
 }
 
 export class EditorConfig {
-    public static readonly version: string = "1.2"; // Not using patch versions in display right now, maybe someday.
+    public static readonly version: string = "1.2.1"; // Not using patch versions in display right now, maybe someday.
     public static readonly versionDisplayName: string = "Dogebox2 " + EditorConfig.version;
 
     public static readonly releaseNotesURL: string = "https://dogeiscut.github.io/dogebox2/patch_notes/" + EditorConfig.version + ".html";
