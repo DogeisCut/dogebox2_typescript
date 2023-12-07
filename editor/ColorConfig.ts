@@ -2991,6 +2991,9 @@ export class ColorConfig {
 				--input-box-outline: #444444;
 				--mute-button-normal: #ff00ff;
 				--mute-button-mod: #00ffff;
+				--mod-label-primary: #282840;
+				--mod-label-secondary-text: rgb(87, 86, 120);
+				--mod-label-primary-text: white;
 				--pitch1-secondary-channel: #f1c40f;
 				--pitch1-primary-channel: #fbff8e;
 				--pitch1-secondary-note: #f9c74f;
@@ -3067,6 +3070,8 @@ export class ColorConfig {
 				--mod4-primary-channel: #82fffb;
 				--mod4-secondary-note: #92ffff;
 				--mod4-primary-note: #b2fffb;
+				--disabled-note-primary: #c6c6c6;
+				--disabled-note-secondary: #8c8c8c;
 				}
 			`,
     };

@@ -45,6 +45,7 @@ export const enum EnvelopeType {
     tremolo,
     tremolo2,
     decay,
+    clap
 }
 
 export const enum InstrumentType {
@@ -423,7 +424,7 @@ export class Config {
         { name: "octave", voices: 2, spread: 6.0, offset: 6.0, expression: 0.8, sign: 1.0 },
         { name: "bowed", voices: 2, spread: 0.02, offset: 0.0, expression: 1.0, sign: -1.0 },
         { name: "piano", voices: 2, spread: 0.01, offset: 0.0, expression: 1.0, sign: 0.7 },
-        { name: "warbled", voices: 2, spread: 0.25, offset: 0.05, expression: 0.9, sign: -0.8 },
+        { name: "warbled", voices: 2, spread: 0.25, offset: 0.05, expression: 0.9, sign: -0.8 }
     ]);
     public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "invert wave"];
     public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.noteRange, EffectType.invertWave];
@@ -522,6 +523,7 @@ export class Config {
         { name: "decay 1", type: EnvelopeType.decay, speed: 10.0 },
         { name: "decay 2", type: EnvelopeType.decay, speed: 7.0 },
         { name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
+        { name: "clap", type: EnvelopeType.clap, speed: 1.0 },
     ]);
     public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
         { name: "1⟲", indices: [[1], [], [], []] },
@@ -561,9 +563,9 @@ export class Config {
     public static readonly pitchChannelCountMin: number = 1;
     public static readonly pitchChannelCountMax: number = 40;
     public static readonly noiseChannelCountMin: number = 0;
-    public static readonly noiseChannelCountMax: number = 16;
+    public static readonly noiseChannelCountMax: number = 32;
     public static readonly modChannelCountMin: number = 0;
-    public static readonly modChannelCountMax: number = 12;
+    public static readonly modChannelCountMax: number = 24;
     public static readonly noiseInterval: number = 6;
     public static readonly pitchesPerOctave: number = 12; // TODO: Use this for converting pitch to frequency.
     public static readonly drumCount: number = 12;
