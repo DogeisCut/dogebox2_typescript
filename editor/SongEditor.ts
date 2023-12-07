@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
-import { InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeNoteRange, DropdownID } from "../synth/SynthConfig";
+import { InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeNoteRange, effectsIncludeInvertWave, DropdownID } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
@@ -1183,6 +1183,7 @@ export class SongEditor {
         this._reverbRow,
         this._upperNoteLimitRow,
         this._lowerNoteLimitRow,
+        this._invertWaveRow,
         div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
             span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "Envelopes")),
             this._envelopeDropdown,
@@ -1190,7 +1191,6 @@ export class SongEditor {
         ),
         this._envelopeDropdownGroup,
         this._envelopeEditor.container,
-        this._invertWaveRow,
     );
     private readonly _instrumentCopyGroup: HTMLDivElement = div({ class: "editor-controls" },
         div({ class: "selectRow" },
@@ -2781,6 +2781,13 @@ export class SongEditor {
                 this._lowerNoteLimitRow.style.display = "none";
             }
 
+            if (effectsIncludeInvertWave(instrument.effects)) {
+                this._invertWaveRow.style.display = "";
+                this._invertWaveBox.checked = instrument.invertWave ? true : false;
+            } else {
+                this._invertWaveRow.style.display = "none";
+            }
+
             if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
                 this._unisonSelectRow.style.display = "";
                 setSelectedValue(this._unisonSelect, instrument.unison);
@@ -2794,8 +2801,6 @@ export class SongEditor {
                 this._unisonSelectRow.style.display = "none";
                 this._unisonDropdownGroup.style.display = "none";
             }
-
-            this._invertWaveRow.style.display = "";
 
             this._envelopeEditor.render();
 
@@ -3061,7 +3066,8 @@ export class SongEditor {
                             anyInstrumentChorus:       boolean = false,
                             anyInstrumentEchoes:       boolean = false,
                             anyInstrumentReverbs:      boolean = false,
-                            anyInstrumentNoteRanges:   boolean = false;
+                            anyInstrumentNoteRanges:   boolean = false,
+                            anyInstrumentInvertWaves:  boolean = false;
                         let allInstrumentPitchShifts:  boolean = true,
                             allInstrumentNoteFilters:  boolean = true,
                             allInstrumentDetunes:      boolean = true,
@@ -3072,7 +3078,8 @@ export class SongEditor {
                             allInstrumentChorus:       boolean = true,
                             allInstrumentEchoes:       boolean = true,
                             allInstrumentReverbs:      boolean = true,
-                            allInstrumentNoteRanges:      boolean = true;
+                            allInstrumentNoteRanges:   boolean = true,
+                            allInstrumentInvertWaves:  boolean = true;
                         let instrumentCandidates: number[] = [];
                         if (modInstrument >= channel.instruments.length) {
                             for (let i: number = 0; i < channel.instruments.length; i++) {
@@ -3158,7 +3165,13 @@ export class SongEditor {
                                 anyInstrumentNoteRanges = true;
                             }
                             else {
-                                allInstrumentNoteFilters = false;
+                                allInstrumentNoteRanges = false;
+                            }
+                            if (effectsIncludeNoteRange(channel.instruments[instrumentIndex].effects)) {
+                                anyInstrumentInvertWaves = true;
+                            }
+                            else {
+                                allInstrumentInvertWaves = false;
                             }
 
                         }
@@ -3284,6 +3297,13 @@ export class SongEditor {
                         }
                         if (!allInstrumentNoteRanges) {
                             unusedSettingList.push("+ note range");
+                        }
+
+                        if (anyInstrumentInvertWaves) {
+                            settingList.push("invert wave");
+                        }
+                        if (!allInstrumentInvertWaves) {
+                            unusedSettingList.push("+ invert wave");
                         }
 
                     }

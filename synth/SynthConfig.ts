@@ -104,7 +104,7 @@ export const enum EffectType {
     transition,
     chord,
     noteRange,
-    // If you add more, you'll also have to extend the bitfield used in Base64 which currently uses two six-bit characters.
+    invertWave,
     length,
 }
 
@@ -923,21 +923,18 @@ export class Config {
 	public static readonly barCountMax: number = 1024;
     public static readonly instrumentCountMin: number = 1;
     public static readonly layeredInstrumentCountMax: number = 10;
-    public static readonly patternInstrumentCountMax: number = 10;
-	public static readonly partsPerBeat: number = 24;
-	public static readonly ticksPerPart: number = 2;
-	public static readonly ticksPerArpeggio: number = 3;
-	public static readonly arpeggioPatterns: ReadonlyArray<ReadonlyArray<number>> = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7] ];
-	public static readonly rhythms: DictionaryArray<Rhythm> = toNameMap([
-		{ name: "÷1 (whole notes)", stepsPerBeat: 1, /*ticksPerArpeggio: 6, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: [3] },
-		{ name: "÷2 (half notes)", stepsPerBeat: 2, /*ticksPerArpeggio: 5, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: [3, 9] },
-		{ name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
-		{ name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
-		{ name: "÷6 (sextuplets)", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-		{ name: "÷8 (32nd notes)", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-		{ name: "÷12 (doudectuplets)", stepsPerBeat: 12, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1]]*/ roundUpThresholds: null },
-		{ name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-	]);
+    public static readonly patternInstrumentCountMax: number = 48;
+    public static readonly partsPerBeat: number = 24;
+    public static readonly ticksPerPart: number = 2;
+    public static readonly ticksPerArpeggio: number = 3;
+    public static readonly arpeggioPatterns: ReadonlyArray<ReadonlyArray<number>> = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7]];
+    public static readonly rhythms: DictionaryArray<Rhythm> = toNameMap([
+        { name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
+        { name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
+        { name: "÷6", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "÷8", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+    ]);
 
     public static readonly instrumentTypeNames: ReadonlyArray<string> = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op"];
 	public static readonly instrumentTypeHasSpecialInterval: ReadonlyArray<boolean> = [true, true, false, false, false, true, false, false, false, false, false];
@@ -1088,7 +1085,7 @@ export class Config {
     public static readonly filterGainRange: number = 15;
     public static readonly filterGainCenter: number = 7;
     public static readonly filterGainStep: number = 1.0 / 2.0;
-    public static readonly filterMaxPoints: number = 8;
+    public static readonly filterMaxPoints: number = 12;
     public static readonly filterTypeNames: ReadonlyArray<string> = ["low-pass", "high-pass", "peak"]; // See FilterType enum above.
     public static readonly filterMorphCount: number = 10; // Number of filter shapes allowed for modulating between. Counts the 0/default position.
 
@@ -1144,8 +1141,8 @@ export class Config {
         { name: "piano", voices: 2, spread: 0.01, offset: 0.0, expression: 1.0, sign: 0.7 },
         { name: "warbled", voices: 2, spread: 0.25, offset: 0.05, expression: 0.9, sign: -0.8 },
     ]);
-    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range"];
-    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.noteRange];
+    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "note range", "invert wave"];
+    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.noteRange, EffectType.invertWave];
     public static readonly noteSizeMax: number = 6;
 	public static readonly volumeRange: number = 50;
 	// Beepbox's old volume scale used factor -0.5 and was [0~7] had roughly value 6 = 0.125 power. This new value is chosen to have -21 be the same,
@@ -1425,12 +1422,8 @@ export class Config {
     public static readonly harmonicsWavelength: number = 1 << 11; // 2048
     public static readonly pulseWidthRange: number = 50;
     public static readonly pulseWidthStepPower: number = 0.5;
-    public static readonly supersawVoiceCount: number = 7;
-	public static readonly supersawDynamismMax: number = 6;
-	public static readonly supersawSpreadMax: number = 12;
-	public static readonly supersawShapeMax: number = 6;
-    public static readonly pitchChannelCountMin: number = 1;
-    public static readonly pitchChannelCountMax: number = 60;
+    public static readonly pitchChannelCountMin: number = 0;
+    public static readonly pitchChannelCountMax: number = 80;
     public static readonly noiseChannelCountMin: number = 0;
     public static readonly noiseChannelCountMax: number = 32;
     public static readonly modChannelCountMin: number = 0;
@@ -1438,8 +1431,8 @@ export class Config {
     public static readonly noiseInterval: number = 6;
     public static readonly pitchesPerOctave: number = 12; // TODO: Use this for converting pitch to frequency.
     public static readonly drumCount: number = 12;
-    public static readonly pitchOctaves: number = 8;
-    public static readonly modCount: number = 6;
+    public static readonly pitchOctaves: number = 10;
+    public static readonly modCount: number = 8;
     public static readonly maxPitch: number = Config.pitchOctaves * Config.pitchesPerOctave;
     public static readonly maximumTonesPerChannel: number = Config.maxChordSize * 2;
     public static readonly justIntonationSemitones: number[] = [1.0 / 2.0, 8.0 / 15.0, 9.0 / 16.0, 3.0 / 5.0, 5.0 / 8.0, 2.0 / 3.0, 32.0 / 45.0, 3.0 / 4.0, 4.0 / 5.0, 5.0 / 6.0, 8.0 / 9.0, 15.0 / 16.0, 1.0, 16.0 / 15.0, 9.0 / 8.0, 6.0 / 5.0, 5.0 / 4.0, 4.0 / 3.0, 45.0 / 32.0, 3.0 / 2.0, 8.0 / 5.0, 5.0 / 3.0, 16.0 / 9.0, 15.0 / 8.0, 2.0].map(x => Math.log2(x) * Config.pitchesPerOctave);
@@ -2025,6 +2018,9 @@ export function effectsIncludeReverb(effects: number): boolean {
 }
 export function effectsIncludeNoteRange(effects: number): boolean {
     return (effects & (1 << EffectType.noteRange)) != 0;
+}
+export function effectsIncludeInvertWave(effects: number): boolean {
+    return (effects & (1 << EffectType.invertWave)) != 0;
 }
 export function rawChipToIntegrated(raw: DictionaryArray<ChipWave>): DictionaryArray<ChipWave> {
     const newArray: Array<ChipWave> = new Array<ChipWave>(raw.length);

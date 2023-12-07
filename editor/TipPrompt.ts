@@ -115,8 +115,8 @@ export class TipPrompt implements Prompt {
 			case "instrumentType": {
 				message = div(
 					h2("Instrument Type"),
-					p("UltraBox comes with many instrument presets, try them out! You can also create your own custom instruments!"),
-					p("There are also buttons for copying and pasting instruments at the bottom of the instrument settings tab, and for generating random instruments in the \"Randomize\" category in the instrument type menu."),
+					p("Dogebox2 comes with many instrument presets, try them out! You can also create your own custom instruments!"),
+					p("There are also options for copying and pasting instrument settings and for generating random instruments at the top of the instrument type menu."),
 				);
 			} break;
 			case "eqFilter": {
@@ -156,34 +156,13 @@ export class TipPrompt implements Prompt {
 			case "chipWave": {
 				message = div(
 					h2("Chip Wave"),
-					p("UltraBox comes with some sound waves based on classic electronic sound chips, as well as several unique waves. This is the basic source of the sound of the instrument, which is modified by the other instrument settings."),
+					p("Dogebox2 comes with some sound waves based on classic electronic sound chips, as well as several unique waves. This is the basic source of the sound of the instrument, which is modified by the other instrument settings."),
 				);
 			} break;
 			case "chipNoise": {
 				message = div(
 					h2("Noise"),
-					p("UltraBox comes with several basic noise sounds. These do not have any distinct musical pitch, and can be used like drums to create beats and emphasize your song's rhythm."),
-				);
-			} break;
-			case "supersawDynamism": {
-				message = div(
-					h2("Supersaw Dynamism"),
-					p("A supersaw is a combination of many sawtooth waves, and this setting controls the contribution of extra sawtooth waves."),
-					p("At the low end of the slider, only the first wave is contributing to the sound, which sounds like an ordinary static sawtooth wave. At the maximum setting, all of the waves are contributing equally and the resulting tone can randomly shift depending on how the waves line up with each other, similar to the \"unison\" and \"chorus\" settings."),
-				);
-			} break;
-			case "supersawSpread": {
-				message = div(
-					h2("Supersaw Spread"),
-					p("A supersaw is a combination of many sawtooth waves, and this setting controls the distance between their frequencies. The dynamism setting must be used for the extra waves to have any effect."),
-					p("At the low end of the spread slider, all of the voices have the same frequency but random phase, resulting in a different sound every time a note starts. In the middle, the waves all have slightly different frequencies that shift in and out of phase over time similar to the \"unison\" and \"chorus\" settings, creating a classic supersaw sound. At the extreme end, the frequencies are so far apart they sound dissonant."),
-				);
-			} break;
-			case "supersawShape": {
-				message = div(
-					h2("Supersaw Shape"),
-					p("This supersaw instrument includes an option to change the shape of the waves from sawtooth waves to pulse waves. Use this setting to morph between the two shapes."),
-					p("When a pulse wave shape is used, you can also control the pulse width with a separate setting."),
+					p("Dogebox2 comes with several basic noise sounds. These do not have any distinct musical pitch, and can be used like drums to create beats and emphasize your song's rhythm."),
 				);
 			} break;
 			case "pulseWidth": {
@@ -202,9 +181,9 @@ export class TipPrompt implements Prompt {
 			case "chords": {
 				message = div(
 					h2("Chords"),
-					p("When multiple different notes occur at the same time, this is called a chord. Chords can be created in UltraBox's pattern editor by adding notes above or below another note."),
+					p("When multiple different notes occur at the same time, this is called a chord. Chords can be created in Dogebox2's pattern editor by adding notes above or below another note."),
 					p("This setting determines how chords are played. The standard option is \"simultaneous\" which starts playing all of the pitches in a chord at the same instant. The \"strum\" option is similar, but plays the notes starting at slightly different times. The \"arpeggio\" option is used in \"chiptune\" style music and plays a single tone that rapidly alternates between all of the pitches in the chord."),
-					p("Some UltraBox instruments have an option called \"custom interval\" which uses the chord notes to control the interval between the waves of a single tone. This can create strange sound effects when combined with FM modulators."),
+					p("Some Dogebox2 instruments have an option called \"custom interval\" which uses the chord notes to control the interval between the waves of a single tone. This can create strange sound effects when combined with FM modulators."),
 				);
 			} break;
 			case "vibrato": {
@@ -446,7 +425,7 @@ export class TipPrompt implements Prompt {
 			case "aliases": {
 				message = div(
 					h2("Aliasing"),
-					p("UltraBox applies a technique called 'anti-aliasing' to instruments normally to help them sound cleaner even at high frequencies and low sample rates."),
+					p("Dogebox2 applies a technique called 'anti-aliasing' to instruments normally to help them sound cleaner even at high frequencies and low sample rates."),
 					p("When this setting is ticked that technique is disabled, so you may hear strange audio artifacts especially at high pitches and when bending notes. However, this can lend a grungy sound to an instrument that could be desirable."),
 				);
 			} break;
@@ -469,7 +448,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Low-Pass Filter Cutoff Frequency"),
 					p("The lowest setting feels \"muffled\" or \"dark\", and the highest setting feels \"harsh\" or \"bright\"."),
-					p("Most sounds include a range of frequencies from low to high. UltraBox instruments have a filter that allows the lowest frequencies to pass through at full volume, but can reduce the volume of the higher frequencies that are above a cutoff frequency. This setting controls the cutoff frequency and thus the range of higher frequencies that are reduced."),
+					p("Most sounds include a range of frequencies from low to high. Dogebox2 instruments have a filter that allows the lowest frequencies to pass through at full volume, but can reduce the volume of the higher frequencies that are above a cutoff frequency. This setting controls the cutoff frequency and thus the range of higher frequencies that are reduced."),
 					p("This cutoff setting also determines which frequency resonates when the resonance peak setting is used."),
 				);
 			} break;
