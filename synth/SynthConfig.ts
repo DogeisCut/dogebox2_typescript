@@ -45,6 +45,7 @@ export const enum EnvelopeType {
     tremolo,
     tremolo2,
     decay,
+    pulse,
     clap
 }
 
@@ -523,7 +524,11 @@ export class Config {
         { name: "decay 1", type: EnvelopeType.decay, speed: 10.0 },
         { name: "decay 2", type: EnvelopeType.decay, speed: 7.0 },
         { name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
-        { name: "clap", type: EnvelopeType.clap, speed: 1.0 },
+        { name: "pulse", type: EnvelopeType.pulse, speed: 1.0 },
+        { name: "clap 1", type: EnvelopeType.clap, speed: 128.0 },
+        { name: "clap 2", type: EnvelopeType.clap, speed: 64.0 },
+        { name: "clap 3", type: EnvelopeType.clap, speed: 32.0 },
+        
     ]);
     public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
         { name: "1⟲", indices: [[1], [], [], []] },

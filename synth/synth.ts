@@ -5410,7 +5410,8 @@ class EnvelopeComputer {
             case EnvelopeType.punch: return Math.max(1.0, 2.0 - time * 10.0);
             case EnvelopeType.flare: const attack: number = 0.25 / Math.sqrt(envelope.speed); return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
             case EnvelopeType.decay: return Math.pow(2, -envelope.speed * time);
-            case EnvelopeType.clap: return Math.max(0, Math.min(1, 1.0 - Math.abs(time - 0.5) * 2));
+            case EnvelopeType.pulse: return Math.max(0, Math.min(1, 1.0 - Math.abs(time - 0.5) * 2));
+            case EnvelopeType.clap: const mirrors: number = 5; return ((mirrors)/(1+time*envelope.speed*5)) % 1;
             default: throw new Error("Unrecognized operator envelope type.");
         }
 

@@ -4,7 +4,7 @@ import {Scale, Config} from "../synth/SynthConfig";
 
 export class Preferences {
 	public static readonly defaultVisibleOctaves: number = 3;
-	
+
 	public autoPlay: boolean;
 	public autoFollow: boolean;
 	public enableNotePreview: boolean;
@@ -31,11 +31,11 @@ export class Preferences {
 	public ignorePerformedNotesNotInScale: boolean;
 	public metronomeCountIn: boolean;
 	public metronomeWhileRecording: boolean;
-	
+
 	constructor() {
 		this.reload();
 	}
-	
+
 	public reload(): void {
 		this.autoPlay = window.localStorage.getItem("autoPlay") == "true";
 		this.autoFollow = window.localStorage.getItem("autoFollow") != "false";
@@ -59,22 +59,22 @@ export class Preferences {
 		this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
 		this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
 		this.layout = window.localStorage.getItem("layout") || "small";
-		this.colorTheme = window.localStorage.getItem("colorTheme") || "dark classic";
+		this.colorTheme = window.localStorage.getItem("colorTheme") || "dogebox2";
 		this.visibleOctaves = ((<any>window.localStorage.getItem("visibleOctaves")) >>> 0) || Preferences.defaultVisibleOctaves;
-		
+
 		const defaultScale: Scale | undefined = Config.scales.dictionary[window.localStorage.getItem("defaultScale")!];
 		this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
-		
+
 		if (window.localStorage.getItem("volume") != null) {
 			this.volume = Math.min(<any>window.localStorage.getItem("volume") >>> 0, 75);
 		}
-		
+
 		if (window.localStorage.getItem("fullScreen") != null) {
 			if (window.localStorage.getItem("fullScreen") == "true") this.layout = "long";
 			window.localStorage.removeItem("fullScreen");
 		}
 	}
-	
+
 	public save(): void {
 		window.localStorage.setItem("autoPlay", this.autoPlay ? "true" : "false");
 		window.localStorage.setItem("autoFollow", this.autoFollow ? "true" : "false");
