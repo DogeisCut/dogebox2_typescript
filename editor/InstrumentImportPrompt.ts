@@ -4,7 +4,8 @@ import { SongDocument } from "./SongDocument";
 //import { SongEditor } from "./SongEditor";
 import { Prompt } from "./Prompt";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
-//import { Channel, Instrument } from "../synth/synth";
+import { Channel, Instrument } from "../synth/synth";
+import { ChangePasteInstrument } from "./changes";
 
 const {button, div, h2, input, label, br} = HTML;
 
@@ -48,12 +49,40 @@ export class InstrumentImportPrompt implements Prompt {
 	);
 
 	constructor(private _doc: SongDocument) {//, private _editor: SongEditor) {
+		this._fileInput.addEventListener("change", this._whenFileSelected);
 		this._cancelButton.addEventListener("click", this._close);
 		this._replaceBox.addEventListener("change", this._lol);
 		if ((_doc.song.patternInstruments||_doc.song.layeredInstruments)==false) {
 			this._replaceSingleBox.disabled = true;
 			this._replaceBox.disabled = true;
 		}
+	}
+
+		private _whenFileSelected = (): void => {
+			const file: File = this._fileInput.files![0];
+			if (!file) return;
+			const reader: FileReader = new FileReader()
+			reader.onload = (e) => {
+			try {
+					const fileParsed: any = JSON.parse(String(e.target?.result));
+					console.log("Processing file:", fileParsed)
+					if (fileParsed.constructor.name == "Array") {
+						if ((this._doc.song.patternInstruments||this._doc.song.layeredInstruments)==false) {
+							alert("Instrument file contains multiple instruments! Please turn on pattern or layered instruments!");
+							return;
+						}
+						this._import_multiple();
+						return;
+					} else {
+						this._import_single(fileParsed);
+					}
+				} catch (error) {
+					console.error('Error reading file:', error);
+				}
+			};
+			reader.readAsText(file);
+
+			this._close();
 	}
 
 		private _lol = (): void => {
@@ -65,16 +94,27 @@ export class InstrumentImportPrompt implements Prompt {
 	}
 
 		public cleanUp = (): void => {
+		this._fileInput.removeEventListener("change", this._whenFileSelected);
 		this._cancelButton.removeEventListener("click", this._close);
+		this._replaceBox.removeEventListener("change", this._lol);
 	}
 
-        public _decide_import = (): void => {
-
-        }
         public _import_multiple = (): void => {
     }
-        public _import_single = (): void => {
-
+        public _import_single = (file: any): void => {
+			const channel: Channel = this._doc.song.channels[this._doc.channel];
+			if (this._replaceBox.checked) {
+				//Delete all instruments then add this one
+				return;
+			}
+			if (this._replaceSingleBox.checked) {
+				const instrumentCopy: any = JSON.parse(String(file));   
+                const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
+				this._doc.record(new ChangePasteInstrument(this._doc, instrument, instrumentCopy));
+				return;
+			}
+			//Add this instrument
+			return;
     }
 
 }
