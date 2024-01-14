@@ -1,19 +1,18 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Config } from "../synth/SynthConfig";
 import { SongDocument } from "./SongDocument";
-// import { SongEditor } from "./SongEditor";
+import { SongEditor } from "./SongEditor";
 import { Prompt } from "./Prompt";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Channel, Instrument } from "../synth/synth";
 
 const {button, div, h2, input, label, br} = HTML;
+
 export class InstrumentExportPrompt implements Prompt {
 		private readonly _cancelButton: HTMLButtonElement = button({class: "cancelButton"});
         private readonly _exportButton: HTMLButtonElement = button({ class: "exportButton", style: "width:45%;" }, "Export");
         private readonly _exportMultipleBox: HTMLInputElement = input({style: "width: 3em; margin-left: 1em;", type: "checkbox"});
-        private readonly _channelName: String = this._doc.song.channels[this._doc.channel].name == "" ? Config.jsonFormat + "-Instrument" : this._doc.song.channels[this._doc.channel].name;
-        private readonly _fileName: HTMLInputElement = input({ type: "text", style: "width: 10em;", value: this._channelName, maxlength: 250, "autofocus": "autofocus" });
+        private readonly _fileName: HTMLInputElement = input({ type: "text", style: "width: 10em;", value: "BeepBox-Instrument", maxlength: 250, "autofocus": "autofocus" }); //ideally it'd defualt to the channel name
 
 		public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 200px;" },
 		    h2("Export Instruments Options"),
@@ -33,7 +32,7 @@ export class InstrumentExportPrompt implements Prompt {
 		this._cancelButton,
 	);
 
-	constructor(private _doc: SongDocument) { //, private _editor: SongEditor
+	constructor(private _doc: SongDocument, private _editor: SongEditor) {
 		this._cancelButton.addEventListener("click", this._close);
         this._exportButton.addEventListener("click", this._decide_export);
         this._fileName.addEventListener("input", InstrumentExportPrompt._validateFileName)
@@ -68,8 +67,7 @@ export class InstrumentExportPrompt implements Prompt {
         downloadLink.click();
         document.body.removeChild(downloadLink);
 
-        // this._editor.refocusStage();
-        this._close();
+        this._editor.refocusStage();
     }
         public _export_single = (): void => {
         const channel: Channel = this._doc.song.channels[this._doc.channel];
@@ -85,8 +83,7 @@ export class InstrumentExportPrompt implements Prompt {
         downloadLink.click();
         document.body.removeChild(downloadLink);
 
-        // this._editor.refocusStage();
-        this._close();
+        this._editor.refocusStage();
     }
 
     private static _validateFileName(event: Event | null, use?: HTMLInputElement): void {

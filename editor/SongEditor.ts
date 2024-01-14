@@ -1111,7 +1111,7 @@ export class SongEditor {
     private readonly _feedbackRow2: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackVolume") }, "Fdback Vol:"), this._feedbackAmplitudeSlider.container);
     /*
      * @jummbus - my very real, valid reason for cutting this button: I don't like it.
-     * 
+     *
     private readonly _customizeInstrumentButton: HTMLButtonElement = button({type: "button", style: "margin: 2px 0"},
 
         "Customize Instrument",
@@ -1667,8 +1667,8 @@ export class SongEditor {
         this.mainLayer.addEventListener("focusin", this._onFocusIn);
         this._instrumentCopyButton.addEventListener("click", this._copyInstrument.bind(this));
         this._instrumentPasteButton.addEventListener("click", this._pasteInstrument.bind(this));
-        this._instrumentExportButton.addEventListener("click", this._exportInstrument.bind(this));
-        this._instrumentImportButton.addEventListener("click", this._importInstrument.bind(this));
+        this._instrumentExportButton.addEventListener("click", this._exportInstruments.bind(this));
+        this._instrumentImportButton.addEventListener("click", this._importInstruments.bind(this));
 
         this._instrumentVolumeSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangeVolume(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(25.0, Math.max(-25.0, Math.round(+this._instrumentVolumeSliderInputBox.value))))) });
         this._panSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangePan(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].pan, Math.min(100.0, Math.max(0.0, Math.round(+this._panSliderInputBox.value))))) });
@@ -1691,7 +1691,7 @@ export class SongEditor {
 
         this._upperNoteLimitInputBox.addEventListener("input", () => { this._doc.record(new ChangeUpperLimit(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].upperNoteLimit, (+this._upperNoteLimitInputBox.value))) });
         this._lowerNoteLimitInputBox.addEventListener("input", () => { this._doc.record(new ChangeLowerLimit(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].lowerNoteLimit, (+this._lowerNoteLimitInputBox.value))) });
-        
+
 
         this._promptContainer.addEventListener("click", (event) => {
             if (this._doc.prefs.closePromptByClickoff === true) {
@@ -2077,31 +2077,10 @@ export class SongEditor {
                     this.prompt = new RecordingSetupPrompt(this._doc);
                     break;
                 case "exportInstrument":
-                    this.prompt = new InstrumentExportPrompt(this._doc);//, this);
+                    this.prompt = new InstrumentExportPrompt(this._doc, this);
                     break;
                 case "importInstrument":
                     this.prompt = new InstrumentImportPrompt(this._doc);//, this);
-                    break;
-                case "stringSustain":
-					this.prompt = new SustainPrompt(this._doc);
-					break;
-                case "addExternal":
-                    this.prompt = new AddSamplesPrompt(this._doc);
-                    break;
-                case "generateEuclideanRhythm":
-                    this.prompt = new EuclideanRhythmPrompt(this._doc);
-                    break;
-                case "custom":
-                    this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer")!);
-                    break;
-                case "visualLoopControls":
-                    this.prompt = new VisualLoopControlsPrompt(this._doc, this);
-                    break;
-                case "sampleLoadingStatus":
-                    this.prompt = new SampleLoadingStatusPrompt(this._doc);
-                    break;
-                case "configureShortener":
-                    this.prompt = new ShortenerConfigPrompt(this._doc);
                     break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
@@ -2841,14 +2820,14 @@ export class SongEditor {
             this._upperNoteLimitRow.firstChild!.textContent = "Upper Note Limit [" + Piano.getPitchNameAlwaysOctave(
                 (instrument.upperNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave,
                 instrument.upperNoteLimit,
-                0) 
+                0)
                 + "]:"
             this._lowerNoteLimitRow.firstChild!.textContent = "Lower Note Limit [" + Piano.getPitchNameAlwaysOctave(
                 (instrument.lowerNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave,
                 instrument.lowerNoteLimit,
                 0)
                  + "]:"
-            
+
 
             if (instrument.type == InstrumentType.customChipWave) {
                 this._customWaveDrawCanvas.redrawCanvas();
@@ -2922,7 +2901,7 @@ export class SongEditor {
             this._modulatorGroup.style.display = "";
             this._modulatorGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
 
-            
+
 
             for (let mod: number = 0; mod < Config.modCount; mod++) {
 
@@ -4251,7 +4230,7 @@ export class SongEditor {
                 } else {
                     if (this._doc.prefs.enableChannelMuting) {
                         // JummBox deviation: I like shift+s as just another mute toggle personally.
-                        // Easier to reach than M and the shift+s invert functionality I am overwriting could be 
+                        // Easier to reach than M and the shift+s invert functionality I am overwriting could be
                         // obtained with M anyway. Useability-wise you very often want to 'add' channels on to a solo as you work.
                         if (event.shiftKey) {
                             this._doc.selection.muteChannels(false);
@@ -4685,64 +4664,14 @@ export class SongEditor {
         this.refocusStage();
     }
 
-    private _exportInstrument = (): void => {
-        const channel: Channel = this._doc.song.channels[this._doc.channel];
-        const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
-        const instrumentCopy: any = instrument.toJsonObject();
-        instrumentCopy["isDrum"] = this._doc.song.getChannelIsNoise(this._doc.channel);
-    
-        const jsonBlob = new Blob([JSON.stringify(instrumentCopy)], { type: 'application/json' });
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(jsonBlob);
-        downloadLink.download = 'instrument.json';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    
-        this.refocusStage();
+    private _exportInstruments = (): void => {
+        this._openPrompt("exportInstrument");
     }
 
-    private _importInstrument = (): void => {
-        // Create a hidden file input element
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.json';
-        fileInput.style.display = 'none';
-    
-        // Add an event listener for when a file is selected
-        fileInput.addEventListener('change', (event) => {
-            const files = (event.target as HTMLInputElement).files;
-    
-            if (files && files.length > 0) {
-                const reader = new FileReader();
-    
-                reader.onload = (e) => {
-                    try {
-                        const instrumentCopy: any = JSON.parse(String(e.target?.result));
-                        const channel: Channel = this._doc.song.channels[this._doc.channel];
-                        const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
-    
-                        if (instrumentCopy != null && instrumentCopy["isDrum"] == this._doc.song.getChannelIsNoise(this._doc.channel)) {
-                            this._doc.record(new ChangePasteInstrument(this._doc, instrument, instrumentCopy));
-                        }
-    
-                        this.refocusStage();
-                    } catch (error) {
-                        console.error('Error reading file:', error);
-                    }
-                };
-    
-                reader.readAsText(files[0]);
-    
-                // Remove the temporary file input element
-                document.body.removeChild(fileInput);
-            }
-        });
-    
-        // Trigger the click event to open the file dialog
-        document.body.appendChild(fileInput);
-        fileInput.click();
+    private _importInstruments = (): void => {
+        this._openPrompt("importInstrument");
     };
+
 
     private _switchEQFilterType(toSimple: boolean) {
         const channel: Channel = this._doc.song.channels[this._doc.channel];
