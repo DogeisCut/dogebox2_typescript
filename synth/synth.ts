@@ -2301,8 +2301,10 @@ export class Song {
     private static readonly _latestBeepboxVersion: number = 9;
     private static readonly _oldestJummBoxVersion: number = 1;
     private static readonly _latestJummBoxVersion: number = 5;
-    // One-character variant detection at the start of URL to distinguish variants such as JummBox.
-    private static readonly _variant = 0x6A; //"j" ~ jummbox
+    //private static readonly _oldestDogebox2Version: number = 1;
+    //private static readonly _latestDogebox2Version: number = 3;
+    // One-character variant detection at the start of URL to distinguish variants such as JummBox or in this case, Dogebox2.
+    private static readonly _variant = 0x64; //"d" ~ Dogebox2
 
     public title: string;
     public scale: number;
@@ -5410,7 +5412,7 @@ class EnvelopeComputer {
             case EnvelopeType.punch: return Math.max(1.0, 2.0 - time * 10.0);
             case EnvelopeType.flare: const attack: number = 0.25 / Math.sqrt(envelope.speed); return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
             case EnvelopeType.decay: return Math.pow(2, -envelope.speed * time);
-            case EnvelopeType.pulse: return Math.max(0, Math.min(1, 1.0 - Math.abs(time - 0.5) * 2));
+            case EnvelopeType.blip: const adjust: number = Math.log(envelope.speed)/25; return Math.max(0, Math.min(1, 1.0 - Math.abs((time- adjust)*envelope.speed - 0.5) * 2));
             case EnvelopeType.clap: const mirrors: number = 5; return ((mirrors)/(1+time*envelope.speed*5)) % 1;
             default: throw new Error("Unrecognized operator envelope type.");
         }

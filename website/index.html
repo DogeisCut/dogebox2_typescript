@@ -161,20 +161,19 @@
         <section>
 
             <h1>
-                <font color="#9c64f7">Dogebox2</font>
-                <span id="jummboxPlant" style="display: inline; color:#62a13b"></span>
+                <font color="#AB382C">Dogebox2</font>
+                <span id="dogebox2FastFood" style="display: inline; color:#ffd829"></span>
             </h1>
             
             <p id="introduction">
                 This is an online tool for sketching and sharing chiptune melodies.<br>
-                It is a modification of the <a href="https://www.beepbox.co/">original BeepBox</a> by John Nesky.
+                It is a modification of <a href="https://jummb.us/">original JummBox</a> by Jummbus.
             </p>
             <p>
                 If you're familiar with BeepBox and just want to learn what JummBox does differently, check out this <a href="https://youtu.be/26yDP4ACuzE">overview video</a>.
-                You can also find the latest patch notes <a href="https://jummbus.bitbucket.io/patch_notes/2.5.html">here</a>.
             </p>
             <p>
-                If you're familiar with JummBox and just want to learn what Dogebox2 does differently, too bad.
+                If you're familiar with JummBox and just want to learn what Dogebox2 does differently, look at its <a href="https://beepbox.miraheze.org/wiki/Dogebox2">wiki page</a>.
             </p>
             <p>
                 All song data is contained in the URL at the top of your browser.
@@ -253,15 +252,6 @@
 
                     </p>
                     <p>
-                        Dogebox2 has many more features.
-                        Try playing with the buttons and menus on the right side to find out what it can do!
-                        You can also click on the label next to each option for a description of what it does.
-                    </p>
-                    <p>
-                        Dogebox2 just adds some stuff.
-                        Such as the invert wave checkbox for phase cancelling! 
-                    </p>
-                    <p>
                         <a href="https://twitter.com/beepboxco" target="_blank">Check out some of these songs that other people have posted on Twitter!</a>
                         If you find something you like, you should let the creator know!
                         And if you see any beginners asking for advice, maybe you can help them!
@@ -280,13 +270,13 @@
                         Dogebox2 does not claim ownership over songs created with it, so original songs belong to their authors.
                     </p>
                     <p>
-                        Neither Jummbus nor Dogebox2 assume responsibility for any copyrighted material played on Dogebox2. No songs are ever received, recorded, or distributed by Dogebox2's servers. All song data is contained in the URL after the hash (#) mark, and Dogebox2 running inside your browser converts that data into sound waves.
+                        Neither Jummbus nor DogeisCut assume responsibility for any copyrighted material played on Dogebox2. No songs are ever received, recorded, or distributed by Dogebox2's servers. All song data is contained in the URL after the hash (#) mark, and Dogebox2 running inside your browser converts that data into sound waves.
                     </p>
                     <p>
                         Dogebox2 does not collect, track, or share any user data.
                     </p>
                     <p id="offline-instructions">
-                        You can download <a download="jummbox_offline.html" href="jummbox_offline.html">an offline version of JummBox</a> to use when you don't have access to the internet. The features are otherwise the same.
+                        You can download <a download="dogebox2_offline.html" href="dogebox2_offline.html">an offline version of Dogebox2</a> to use when you don't have access to the internet. The features are otherwise the same.
                     </p>
                     <p>
                         You can download and use <a href="https://github.com/DogeisCut/dogebox2" target="_blank">the source code</a> under the MIT license.
@@ -308,16 +298,16 @@
         if (Math.floor(Math.random() * 10) == 0) {
             switch (Math.floor(Math.random() * 4)) {
                 case 0:
-                    document.getElementById("jummboxPlant").innerHTML = "  🍕";
+                    document.getElementById("dogebox2FastFood").innerHTML = "  🍕";
                     break;
                 case 1:
-                    document.getElementById("jummboxPlant").innerHTML = "  🌭";
+                    document.getElementById("dogebox2FastFood").innerHTML = "  🌭";
                     break;
                 case 2:
-                    document.getElementById("jummboxPlant").innerHTML = "  🍔";
+                    document.getElementById("dogebox2FastFood").innerHTML = "  🍔";
                     break;
                 case 3:
-                    document.getElementById("jummboxPlant").innerHTML = "  🍟";
+                    document.getElementById("dogebox2FastFood").innerHTML = "  🍟";
                     break;
             }
         }
