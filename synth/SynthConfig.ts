@@ -53,7 +53,7 @@ export const enum EnvelopeType {
 	tremolo,
 	tremolo2,
     decay,
-    pulse,
+    blip,
     clap
 }
 
@@ -1302,7 +1302,9 @@ export class Config {
         { name: "decay 1", type: EnvelopeType.decay, speed: 10.0 },
         { name: "decay 2", type: EnvelopeType.decay, speed: 7.0 },
         { name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
-        { name: "pulse", type: EnvelopeType.pulse, speed: 1.0 },
+        { name: "blip 1", type: EnvelopeType.blip, speed: 32.0 },
+        { name: "blip 2", type: EnvelopeType.blip, speed: 8.0 },
+        { name: "blip 3", type: EnvelopeType.blip, speed: 2.0 },
         { name: "clap 1", type: EnvelopeType.clap, speed: 128.0 },
         { name: "clap 2", type: EnvelopeType.clap, speed: 64.0 },
         { name: "clap 3", type: EnvelopeType.clap, speed: 32.0 },
