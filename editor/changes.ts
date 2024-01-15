@@ -3320,9 +3320,9 @@ export class ChangePasteInstrument extends ChangeGroup {
 export class ChangeAppendInstrument extends ChangeGroup {
     constructor(doc: SongDocument, channel: Channel, instrument: any) {
         super();
-        let newInstrument: Instrument = new Instrument(instrument["isDrum"], instrument["isMod"])
-        newInstrument.fromJsonObject(instrument, instrument["isDrum"], instrument["isMod"], false, false);
-        channel.instruments.push(newInstrument);
+        let newInsturm: Instrument = new Instrument(instrument["isDrum"], instrument["isMod"])
+        newInsturm.fromJsonObject(instrument, instrument["isDrum"], instrument["isMod"], false, false);
+        channel.instruments.push(newInsturm);
         this._didSomething();
         doc.notifier.changed();
     }
