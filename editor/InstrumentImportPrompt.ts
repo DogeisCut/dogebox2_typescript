@@ -5,6 +5,7 @@ import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Channel, Instrument } from "../synth/synth";
+import { ChangePasteInstrument, ChangeAppendInstrument } from "./changes";
 
 const {button, div, h2, input, select, option } = HTML;
 
@@ -85,23 +86,45 @@ export class InstrumentImportPrompt implements Prompt {
 	}
 
         public _import_multiple = (file: any): void => {
+			switch (this._importStrategySelect.value) {
+				case "replace":
+					console.log("multi replace");
+					//Replace the current instrument with the first one, then add the rest
+					return;
+				case "all":
+					console.log("multi all");
+					//Delete all instruments then add these ones
+					return;
+				default:
+					console.log("multi append");
+					//Add these instruments
+					return;
+			}
 
     }
         public _import_single = (file: any): void => {
 			const channel: Channel = this._doc.song.channels[this._doc.channel];
 			switch (this._importStrategySelect.value) {
 				case "replace":
+					//Replace the current instrument with this one
 					console.log("single replace");
-					const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
-					instrument.fromJsonObject(file, file["isDrum"], file["isMod"], false, false);
+					const currentInstrum: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
+					this._doc.record(new ChangePasteInstrument(this._doc, currentInstrum, file));
+					this._doc.prompt = null;
 					return;
 				case "all":
-					console.log("single all");
 					//Delete all instruments then add this one
+					console.log("single all");
+					channel.instruments.length = 1;
+					const firstInstrum = channel.instruments[0];
+					this._doc.record(new ChangePasteInstrument(this._doc, firstInstrum, file));
+					this._doc.prompt = null;
 					return;
 				default:
-					console.log("single append");
 					//Add this instrument
+					console.log("single append");
+					this._doc.record(new ChangeAppendInstrument(this._doc, channel, file));
+					this._doc.prompt = null;
 					return;
 			}
     }
