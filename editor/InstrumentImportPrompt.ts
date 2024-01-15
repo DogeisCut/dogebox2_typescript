@@ -7,28 +7,22 @@ import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Channel, Instrument } from "../synth/synth";
 import { ChangePasteInstrument } from "./changes";
 
-const {button, div, h2, input, label, br} = HTML;
+const {button, div, h2, input, select, option } = HTML;
 
 export class InstrumentImportPrompt implements Prompt {
 		private readonly _cancelButton: HTMLButtonElement = button({class: "cancelButton"});
-        private readonly _replaceBox: HTMLInputElement = input({style: "width: 3em; margin-left: 1em;", type: "checkbox"});
-		private readonly _replaceSingleBox: HTMLInputElement = input({style: "width: 3em; margin-left: 1em;", type: "checkbox"});
+		private readonly _importStrategySelect: HTMLSelectElement = select({style: "width: 100%;"},
+			option({value: "append"}, "Append instruments to the end of the list."),
+			option({value: "replace"}, "Replaced only the selected instrument."),
+			option({value: "all"}, "Replace all instruments in the channel."),
+		);
 		private readonly _fileInput: HTMLInputElement = input({type: "file", accept: ".json,application/json"});
 
-		public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 250px;" },
+		public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 300px;" },
 		    h2("Import Instrument(s)"),
-            label({style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;"},
-			"Replace all instruments",
-			br(),
-			"in channel:",
-			this._replaceBox,
-		    ),
-			label({style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;"},
-			"Replace only selected",
-			br(),
-			"instrument:",
-			this._replaceSingleBox,
-		    ),
+            div({style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;"},
+				div({class: "selectContainer", style: "width: 100%;"}, this._importStrategySelect),
+			),
 		this._fileInput,
 		this._cancelButton,
 
@@ -44,17 +38,16 @@ export class InstrumentImportPrompt implements Prompt {
 		//importing a multi instrument with no multi instrument settings turned on will alert an a warning and not import the instrument
 		//checkbox 1 and 2 will always be grayed out if multi instruments arent enabled.
 
-		//doc.song.layeredInstruments 
+		//doc.song.layeredInstruments
 		//doc.song.patternInstruments
 	);
 
 	constructor(private _doc: SongDocument) {//, private _editor: SongEditor) {
 		this._fileInput.addEventListener("change", this._whenFileSelected);
 		this._cancelButton.addEventListener("click", this._close);
-		this._replaceBox.addEventListener("change", this._lol);
 		if ((_doc.song.patternInstruments||_doc.song.layeredInstruments)==false) {
-			this._replaceSingleBox.disabled = true;
-			this._replaceBox.disabled = true;
+			this._importStrategySelect.disabled = true;
+			this._importStrategySelect.value = "replace";
 		}
 	}
 
@@ -71,7 +64,7 @@ export class InstrumentImportPrompt implements Prompt {
 							alert("Instrument file contains multiple instruments! Please turn on pattern or layered instruments!");
 							return;
 						}
-						this._import_multiple();
+						this._import_multiple(fileParsed);
 						return;
 					} else {
 						this._import_single(fileParsed);
@@ -85,10 +78,6 @@ export class InstrumentImportPrompt implements Prompt {
 			this._close();
 	}
 
-		private _lol = (): void => {
-		this._replaceSingleBox.disabled = this._replaceBox.checked
-	}
-
 		private _close = (): void => {
 		this._doc.undo();
 	}
@@ -96,25 +85,26 @@ export class InstrumentImportPrompt implements Prompt {
 		public cleanUp = (): void => {
 		this._fileInput.removeEventListener("change", this._whenFileSelected);
 		this._cancelButton.removeEventListener("click", this._close);
-		this._replaceBox.removeEventListener("change", this._lol);
 	}
 
-        public _import_multiple = (): void => {
+        public _import_multiple = (file: any): void => {
+
     }
         public _import_single = (file: any): void => {
 			const channel: Channel = this._doc.song.channels[this._doc.channel];
-			if (this._replaceBox.checked) {
-				//Delete all instruments then add this one
-				return;
+			switch (this._importStrategySelect.value) {
+				case "replace":
+					this._close();
+					const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
+					this._doc.record(new ChangePasteInstrument(this._doc, instrument, file));
+					return;
+				case "all":
+					//Delete all instruments then add this one
+					return;
+				default:
+					//Add this instrument
+					return;
 			}
-			if (this._replaceSingleBox.checked) {
-				const instrumentCopy: any = JSON.parse(String(file));   
-                const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
-				this._doc.record(new ChangePasteInstrument(this._doc, instrument, instrumentCopy));
-				return;
-			}
-			//Add this instrument
-			return;
     }
 
 }
