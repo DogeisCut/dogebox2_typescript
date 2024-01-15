@@ -5,7 +5,6 @@ import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Channel, Instrument } from "../synth/synth";
-import { ChangePasteInstrument } from "./changes";
 
 const {button, div, h2, input, select, option } = HTML;
 
@@ -74,8 +73,6 @@ export class InstrumentImportPrompt implements Prompt {
 				}
 			};
 			reader.readAsText(file);
-
-			this._close();
 	}
 
 		private _close = (): void => {
@@ -94,14 +91,16 @@ export class InstrumentImportPrompt implements Prompt {
 			const channel: Channel = this._doc.song.channels[this._doc.channel];
 			switch (this._importStrategySelect.value) {
 				case "replace":
-					this._close();
+					console.log("single replace");
 					const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
-					this._doc.record(new ChangePasteInstrument(this._doc, instrument, file));
+					instrument.fromJsonObject(file, file["isDrum"], file["isMod"], false, false);
 					return;
 				case "all":
+					console.log("single all");
 					//Delete all instruments then add this one
 					return;
 				default:
+					console.log("single append");
 					//Add this instrument
 					return;
 			}
