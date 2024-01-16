@@ -105,39 +105,16 @@ export class InstrumentImportPrompt implements Prompt {
 			}
 
     }
-		public _validate_instrument_limit = (channel: Channel): boolean => {
-			if (this._doc.song.layeredInstruments) {
-				if (this._doc.song.getMaxInstrumentsPerChannel()<=channel.instruments.length) {
-					this._doc.prompt = null;
-					alert("Max instruments reached! The instrument was not imported.");
-					return false;
-				}
-				if (this._doc.song.patternInstruments) {
-					if (this._doc.song.getMaxInstrumentsPerPatternForChannel(channel)<=channel.instruments.length) {
 
-						this._doc.prompt = null;
-						alert("Max instruments reached! The instrument was not imported.");
-						return false;
-					}
-				}
-			} else if (this._doc.song.patternInstruments) {
-				if (this._doc.song.getMaxInstrumentsPerPattern(this._doc.channel)<=channel.instruments.length) {
-					this._doc.prompt = null;
-					alert("Max instruments reached! The instrument was not imported.");
-					return false;
-				}
+		public _validate_instrument_limit = (channel: Channel): boolean => {
+			if (this._doc.song.getMaxInstrumentsPerChannel()<channel.instruments.length) {
+				alert("Max instruments reached! The instrument was not imported.");
+				this._close()
+				return false;
 			}
 			return true;
 		}
 
-		// public _validate_instrument_limit = (channel: Channel): boolean => {
-		// 	if (this._doc.song.getMaxInstrumentsPerChannel()<=channel.instruments.length) {
-		// 		alert("Max instruments reached! The instrument was not imported.");
-		// 		this._close()
-		// 		return false;
-		// 	}
-		// 	return true;
-		// }
         public _import_single = (file: any): void => {
 			const channel: Channel = this._doc.song.channels[this._doc.channel];
 			const currentInstrum: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
