@@ -2449,7 +2449,8 @@ export class PatternEditor {
 
                             if (this._doc.prefs.notesFlashWhenPlayed) {
                                 notePath = SVG.path();
-                                notePath.setAttribute("fill", "var(--note-flash-secondary)");
+                                const noteFlashColor = ColorConfig.getComputed("--note-flash-secondary") !== "" ? "var(--note-flash-secondary)" : "#ffffff77";
+                                notePath.setAttribute("fill", noteFlashColor);
                                 notePath.setAttribute("pointer-events", "none");
                                 this._drawNote(notePath, pitch, note.start, note.pins, this._pitchHeight * 0.19, false, octaveOffset);
                                 this._svgNoteContainer.appendChild(notePath);
@@ -2516,7 +2517,8 @@ export class PatternEditor {
 
                     if (this._doc.prefs.notesFlashWhenPlayed&&!disabled) {
                         notePath = SVG.path();
-                        notePath.setAttribute("fill", "var(--note-flash)");
+                        const noteFlashColor = ColorConfig.getComputed("--note-flash") !== "" ? "var(--note-flash)" : "#ffffff";
+                        notePath.setAttribute("fill", noteFlashColor);
                         notePath.setAttribute("pointer-events", "none");
                         this._drawNote(notePath, pitch, note.start, note.pins, (this._pitchHeight - this._pitchBorder) / 2 + 1, true, this._octaveOffset);
                         this._svgNoteContainer.appendChild(notePath);

@@ -89,27 +89,58 @@ export class InstrumentImportPrompt implements Prompt {
 	}
 
         public _import_multiple = (file: any): void => {
+			const channel: Channel = this._doc.song.channels[this._doc.channel];
+			const currentInstrum: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
 			switch (this._importStrategySelect.value) {
 				case "replace":
 					console.log("multi replace");
 					//Replace the current instrument with the first one, then add the rest
+					const firstInstrum = file[0];
+					this._doc.record(new ChangePasteInstrument(this._doc, currentInstrum, firstInstrum));
+					for (let i = 1; i < file.length; i++) {
+						const insturm: any = file[i];
+						if (!this._validate_instrument_limit(channel)) { 
+							alert("Max instruments reached! Some instruments were not imported.");
+							this._doc.prompt = null;
+							break;
+						}
+						this._doc.record(new ChangeAppendInstrument(this._doc, channel, insturm));
+					}
+					this._doc.prompt = null;
 					return;
 				case "all":
 					console.log("multi all");
 					//Delete all instruments then add these ones
+					channel.instruments.length = 0;
+					for (let insturm of file) {
+						if (!this._validate_instrument_limit(channel)) { 
+							alert("Max instruments reached! Some instruments were not imported.");
+							this._doc.prompt = null;
+							break;
+						}
+						this._doc.record(new ChangeAppendInstrument(this._doc, channel, insturm));
+					}
+					this._doc.prompt = null;
 					return;
 				default:
 					console.log("multi append");
 					//Add these instruments
+					for (let insturm of file) {
+						if (!this._validate_instrument_limit(channel)) { 
+							alert("Max instruments reached! Some instruments were not imported.");
+							this._doc.prompt = null;
+							break;
+						}
+						this._doc.record(new ChangeAppendInstrument(this._doc, channel, insturm));
+					}
+					this._doc.prompt = null;
 					return;
 			}
 
     }
 
 		public _validate_instrument_limit = (channel: Channel): boolean => {
-			if (this._doc.song.getMaxInstrumentsPerChannel()<channel.instruments.length) {
-				alert("Max instruments reached! The instrument was not imported.");
-				this._close()
+			if (this._doc.song.getMaxInstrumentsPerChannel()<=channel.instruments.length) {
 				return false;
 			}
 			return true;
@@ -118,7 +149,6 @@ export class InstrumentImportPrompt implements Prompt {
         public _import_single = (file: any): void => {
 			const channel: Channel = this._doc.song.channels[this._doc.channel];
 			const currentInstrum: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
-			//const currentPattern: Pattern|null = this._doc.getCurrentPattern();
 			switch (this._importStrategySelect.value) {
 				case "replace":
 					//Replace the current instrument with this one
@@ -136,7 +166,7 @@ export class InstrumentImportPrompt implements Prompt {
 					return;
 				default:
 					//Add this instrument
-					if (!this._validate_instrument_limit(channel)) return;
+					if (!this._validate_instrument_limit(channel)) { alert("Max instruments reached! The instrument was not imported."); this._doc.prompt = null; return; }
 					console.log("single append");
 					this._doc.record(new ChangeAppendInstrument(this._doc, channel, file));
 					this._doc.prompt = null;
