@@ -634,7 +634,8 @@ export class PatternEditor {
                 const noteStart: number = Number(element.getAttribute("note-start"))/(this._doc.song.beatsPerBar * Config.partsPerBeat)
                 const noteEnd: number = Number(element.getAttribute("note-end"))/(this._doc.song.beatsPerBar * Config.partsPerBeat)
                 if ((modPlayhead>=noteStart)&&this._doc.prefs.notesFlashWhenPlayed) {
-                    element.style.opacity = String((1-((modPlayhead-noteStart)/(noteEnd-noteStart))))
+                    const dist = noteEnd-noteStart
+                    element.style.opacity = String((1-(((modPlayhead-noteStart)-(dist/2))/(dist/2))))
                 } else {
                     element.style.opacity = "0"
                 }

@@ -3232,7 +3232,7 @@ export class ColorConfig {
 				--disabled-note-primary: #c6c6c6;
 				--disabled-note-secondary: #8c8c8c;
 				--note-flash: #ffffff;
-				--note-flash-secondary: #777777;
+				--note-flash-secondary: #ffffff77;
 				}
 			`,
     };
