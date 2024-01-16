@@ -58,7 +58,7 @@ export class Preferences {
 		this.ignorePerformedNotesNotInScale = window.localStorage.getItem("ignorePerformedNotesNotInScale") == "true";
 		this.metronomeCountIn = window.localStorage.getItem("metronomeCountIn") != "false";
 		this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
-		this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") != "true";
+		this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") != "false";
 		this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
 		this.layout = window.localStorage.getItem("layout") || "small";
 		this.colorTheme = window.localStorage.getItem("colorTheme") || "dogebox2";
