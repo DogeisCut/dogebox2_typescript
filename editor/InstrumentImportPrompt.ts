@@ -102,13 +102,47 @@ export class InstrumentImportPrompt implements Prompt {
 			}
 
     }
+		public _validate_instrument_limit = (channel: Channel): boolean => {
+			if (this._doc.song.layeredInstruments) {
+				if (this._doc.song.getMaxInstrumentsPerChannel()<=channel.instruments.length) {
+					this._doc.prompt = null;
+					alert("Max instruments reached! The instrument was not imported.");
+					return false;
+				}
+				if (this._doc.song.patternInstruments) {
+					if (this._doc.song.getMaxInstrumentsPerPatternForChannel(channel)<=channel.instruments.length) {
+
+						this._doc.prompt = null;
+						alert("Max instruments reached! The instrument was not imported.");
+						return false;
+					}
+				}
+			} else if (this._doc.song.patternInstruments) {
+				if (this._doc.song.getMaxInstrumentsPerPattern(this._doc.channel)<=channel.instruments.length) {
+					this._doc.prompt = null;
+					alert("Max instruments reached! The instrument was not imported.");
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// public _validate_instrument_limit = (channel: Channel): boolean => {
+		// 	if (this._doc.song.getMaxInstrumentsPerChannel()<=channel.instruments.length) {
+		// 		alert("Max instruments reached! The instrument was not imported.");
+		// 		this._close()
+		// 		return false;
+		// 	}
+		// 	return true;
+		// }
         public _import_single = (file: any): void => {
 			const channel: Channel = this._doc.song.channels[this._doc.channel];
+			const currentInstrum: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
+			//const currentPattern: Pattern|null = this._doc.getCurrentPattern();
 			switch (this._importStrategySelect.value) {
 				case "replace":
 					//Replace the current instrument with this one
 					console.log("single replace");
-					const currentInstrum: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
 					this._doc.record(new ChangePasteInstrument(this._doc, currentInstrum, file));
 					this._doc.prompt = null;
 					return;
@@ -122,6 +156,7 @@ export class InstrumentImportPrompt implements Prompt {
 					return;
 				default:
 					//Add this instrument
+					if (!this._validate_instrument_limit(channel)) return;
 					console.log("single append");
 					this._doc.record(new ChangeAppendInstrument(this._doc, channel, file));
 					this._doc.prompt = null;
