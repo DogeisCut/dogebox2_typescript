@@ -5,7 +5,7 @@ import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Channel, Instrument } from "../synth/synth";
-import { ChangePasteInstrument, ChangeAppendInstrument } from "./changes";
+import { ChangePasteInstrument, ChangeAppendInstrument, ChangeViewInstrument } from "./changes";
 
 const {button, div, h2, input, select, option } = HTML;
 
@@ -101,12 +101,13 @@ export class InstrumentImportPrompt implements Prompt {
 						const insturm: any = file[i];
 						if (!this._validate_instrument_limit(channel)) { 
 							alert("Max instruments reached! Some instruments were not imported.");
-							this._doc.prompt = null;
 							break;
 						}
 						this._doc.record(new ChangeAppendInstrument(this._doc, channel, insturm));
 					}
+					this._doc.record(new ChangeViewInstrument(this._doc, this._doc.getCurrentInstrument()))
 					this._doc.prompt = null;
+					this._doc.notifier.changed();
 					return;
 				case "all":
 					console.log("multi all");
@@ -115,12 +116,13 @@ export class InstrumentImportPrompt implements Prompt {
 					for (let insturm of file) {
 						if (!this._validate_instrument_limit(channel)) { 
 							alert("Max instruments reached! Some instruments were not imported.");
-							this._doc.prompt = null;
 							break;
 						}
 						this._doc.record(new ChangeAppendInstrument(this._doc, channel, insturm));
 					}
+					this._doc.record(new ChangeViewInstrument(this._doc, channel.instruments.length-1))
 					this._doc.prompt = null;
+					this._doc.notifier.changed();
 					return;
 				default:
 					console.log("multi append");
@@ -128,12 +130,13 @@ export class InstrumentImportPrompt implements Prompt {
 					for (let insturm of file) {
 						if (!this._validate_instrument_limit(channel)) { 
 							alert("Max instruments reached! Some instruments were not imported.");
-							this._doc.prompt = null;
 							break;
 						}
 						this._doc.record(new ChangeAppendInstrument(this._doc, channel, insturm));
 					}
+					this._doc.record(new ChangeViewInstrument(this._doc, channel.instruments.length-1))
 					this._doc.prompt = null;
+					this._doc.notifier.changed();
 					return;
 			}
 
@@ -154,7 +157,9 @@ export class InstrumentImportPrompt implements Prompt {
 					//Replace the current instrument with this one
 					console.log("single replace");
 					this._doc.record(new ChangePasteInstrument(this._doc, currentInstrum, file));
+					this._doc.record(new ChangeViewInstrument(this._doc, this._doc.getCurrentInstrument()))
 					this._doc.prompt = null;
+					this._doc.notifier.changed();
 					return;
 				case "all":
 					//Delete all instruments then add this one
@@ -162,14 +167,18 @@ export class InstrumentImportPrompt implements Prompt {
 					channel.instruments.length = 1;
 					const firstInstrum = channel.instruments[0];
 					this._doc.record(new ChangePasteInstrument(this._doc, firstInstrum, file));
+					this._doc.record(new ChangeViewInstrument(this._doc, 0))
 					this._doc.prompt = null;
+					this._doc.notifier.changed();
 					return;
 				default:
 					//Add this instrument
 					if (!this._validate_instrument_limit(channel)) { alert("Max instruments reached! The instrument was not imported."); this._doc.prompt = null; return; }
 					console.log("single append");
 					this._doc.record(new ChangeAppendInstrument(this._doc, channel, file));
+					this._doc.record(new ChangeViewInstrument(this._doc, channel.instruments.length-1))
 					this._doc.prompt = null;
+					this._doc.notifier.changed();
 					return;
 			}
     }
