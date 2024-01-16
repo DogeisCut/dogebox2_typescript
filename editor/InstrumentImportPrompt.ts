@@ -40,6 +40,9 @@ export class InstrumentImportPrompt implements Prompt {
 
 		//doc.song.layeredInstruments
 		//doc.song.patternInstruments
+
+		//todo: save last strategy since menu opened
+		//select the first imported instrument automatically
 	);
 
 	constructor(private _doc: SongDocument) {//, private _editor: SongEditor) {

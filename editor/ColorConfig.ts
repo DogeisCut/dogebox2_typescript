@@ -3231,6 +3231,8 @@ export class ColorConfig {
 				--mod4-primary-note: #b2fffb;
 				--disabled-note-primary: #c6c6c6;
 				--disabled-note-secondary: #8c8c8c;
+				--note-flash: #00ffff;
+				--note-flash-secondary: #007777;
 				}
 			`,
     };
