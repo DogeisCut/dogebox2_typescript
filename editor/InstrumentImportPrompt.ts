@@ -37,15 +37,9 @@ export class InstrumentImportPrompt implements Prompt {
 
 		//importing a multi instrument with no multi instrument settings turned on will alert an a warning and not import the instrument
 		//checkbox 1 and 2 will always be grayed out if multi instruments arent enabled.
-
-		//doc.song.layeredInstruments
-		//doc.song.patternInstruments
-
-		//todo: save last strategy since menu opened
-		//select the first imported instrument automatically
 	);
 
-	constructor(private _doc: SongDocument) {//, private _editor: SongEditor) {
+	constructor(private _doc: SongDocument) {
 		this._fileInput.addEventListener("change", this._whenFileSelected);
 		this._cancelButton.addEventListener("click", this._close);
 		if ((_doc.song.patternInstruments||_doc.song.layeredInstruments)==false) {
