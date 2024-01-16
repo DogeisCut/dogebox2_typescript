@@ -2514,7 +2514,7 @@ export class PatternEditor {
                             ));
                     }
 
-                    if (this._doc.prefs.notesFlashWhenPlayed) {
+                    if (this._doc.prefs.notesFlashWhenPlayed&&!disabled) {
                         notePath = SVG.path();
                         notePath.setAttribute("fill", "var(--note-flash)");
                         notePath.setAttribute("pointer-events", "none");
