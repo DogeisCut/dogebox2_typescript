@@ -519,7 +519,9 @@ function renderTimeline(): void {
 					timeline.appendChild(noteElement);
 
 					const dflash: string = drawNote(pitch, note.start, note.pins, (pitchHeight + 1) / 2, offsetX, offsetY, partWidth, pitchHeight);
-					const noteFlashElement: SVGPathElement = path({d: dflash, fill: (isNoise ? "var(--note-flash-secondary)" : "var(--note-flash)")});
+					const noteFlashColorSecondary = ColorConfig.getComputed("--note-flash-secondary") !== "" ? "var(--note-flash-secondary)" : "#ffffff77";
+					const noteFlashColor = ColorConfig.getComputed("--note-flash") !== "" ? "var(--note-flash)" : "#ffffff77";
+					const noteFlashElement: SVGPathElement = path({d: dflash, fill: (isNoise ? noteFlashColorSecondary : noteFlashColor)});
 					noteFlashElement.classList.add('note-flash-player');
                     noteFlashElement.style.opacity = "0";
                     noteFlashElement.setAttribute('note-start', String(note.start));
