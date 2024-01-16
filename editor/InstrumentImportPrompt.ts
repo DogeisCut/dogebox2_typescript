@@ -13,7 +13,7 @@ export class InstrumentImportPrompt implements Prompt {
 		private readonly _cancelButton: HTMLButtonElement = button({class: "cancelButton"});
 		private readonly _importStrategySelect: HTMLSelectElement = select({style: "width: 100%;"},
 			option({value: "append"}, "Append instruments to the end of the list."),
-			option({value: "replace"}, "Replaced only the selected instrument."),
+			option({value: "replace"}, "Replace only the selected instrument."),
 			option({value: "all"}, "Replace all instruments in the channel."),
 		);
 		private readonly _fileInput: HTMLInputElement = input({type: "file", accept: ".json,application/json"});
