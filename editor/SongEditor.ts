@@ -390,6 +390,7 @@ export class SongEditor {
         option({ value: "enableChannelMuting" }, "Enable Channel Muting"),
         option({ value: "displayBrowserUrl" }, "Display Song Data in URL"),
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
+        option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
         option({ value: "recordingSetup" }, "Set Up Note Recording..."),
@@ -1518,6 +1519,7 @@ export class SongEditor {
             (prefs.enableChannelMuting ? "✓ " : "　") + "Enable Channel Muting",
             (prefs.displayBrowserUrl ? "✓ " : "　") + "Display Song Data in URL",
             (prefs.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
+            (prefs.notesFlashWhenPlayed ? "✓ " : "　") + "Notes Flash When Played",
             "　Set Layout...",
             "　Set Theme...",
             "　Set Up Note Recording...",
@@ -3907,6 +3909,9 @@ export class SongEditor {
                 break;
             case "displayVolumeBar":
                 this._doc.prefs.displayVolumeBar = !this._doc.prefs.displayVolumeBar;
+                break;
+            case "notesFlashWhenPlayed":
+                this._doc.prefs.notesFlashWhenPlayed = !this._doc.prefs.notesFlashWhenPlayed;
                 break;
             case "layout":
                 this._openPrompt("layout");
