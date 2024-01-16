@@ -1613,7 +1613,7 @@ export class PatternEditor {
                     this._drawNote(notePath, pitch, note.start, note.pins, (this._pitchHeight - this._pitchBorder) / 2 + 1, true, this._octaveOffset);
                     this._svgNoteContainer.appendChild(notePath);
 
-                    if (this._doc.prefs.notesFlashWhenPlayed) {
+                    if (this._doc.prefs.notesFlashWhenPlayed&&!disabled) {
                         notePath = SVG.path();
                         notePath.setAttribute("fill", "var(--note-flash)");
                         notePath.setAttribute("pointer-events", "none");
