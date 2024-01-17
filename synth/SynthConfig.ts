@@ -54,7 +54,8 @@ export const enum EnvelopeType {
 	tremolo2,
     decay,
     blip,
-    clap
+    clap,
+    blippy
 }
 
 export const enum InstrumentType {
@@ -1308,6 +1309,12 @@ export class Config {
         { name: "clap 1", type: EnvelopeType.clap, speed: 128.0 },
         { name: "clap 2", type: EnvelopeType.clap, speed: 64.0 },
         { name: "clap 3", type: EnvelopeType.clap, speed: 32.0 },
+        { name: "blippy 1", type: EnvelopeType.blippy, speed: 32.0 },
+        { name: "blippy 2", type: EnvelopeType.blippy, speed: 16.0 },
+        { name: "blippy 3", type: EnvelopeType.blippy, speed: 8.0 },
+        { name: "blippy 4", type: EnvelopeType.blippy, speed: 4.0 },
+        { name: "blippy 5", type: EnvelopeType.blippy, speed: 2.0 },
+        { name: "blippy 6", type: EnvelopeType.blippy, speed: 1.0 },
         
     ]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
