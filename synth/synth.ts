@@ -5424,6 +5424,7 @@ class EnvelopeComputer {
             case EnvelopeType.decay: return Math.pow(2, -envelope.speed * time);
             case EnvelopeType.blip: const adjust: number = Math.log(envelope.speed)/25; return Math.max(0, Math.min(1, 1.0 - Math.abs((time- adjust)*envelope.speed - 0.5) * 2));
             case EnvelopeType.clap: const mirrors: number = 5; return ((mirrors)/(1+time*envelope.speed*5)) % 1;
+            case EnvelopeType.blippy: return Math.round(0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5);
             default: throw new Error("Unrecognized operator envelope type.");
         }
 
