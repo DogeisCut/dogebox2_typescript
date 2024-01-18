@@ -2379,7 +2379,7 @@ export class Song {
     private static readonly _oldestJummBoxVersion: number = 1;
     private static readonly _latestJummBoxVersion: number = 6;
     private static readonly _oldestDogebox2Version: number = 1;
-    private static readonly _latestDogebox2Version: number = 1;
+    private static readonly _latestDogebox2Version: number = 2;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox or in this case, Dogebox2.
     private static readonly _variant = 0x64; //"d" ~ Dogebox2
 
@@ -3434,13 +3434,13 @@ export class Song {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 // JB before v5 had custom chip and mod before pickedString and supersaw were added. Index +2.
                 let instrumentType: number = validateRange(0, InstrumentType.length - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                if (fromJummBox && beforeFive) {
+                if ((fromJummBox && beforeFive) || (fromDogebox && beforeTwo)) {
                     if (instrumentType == InstrumentType.pickedString || instrumentType == InstrumentType.supersaw) {
                         instrumentType += 2;
                     }
                 }
                 // Similar story here, JB before v5 had custom chip and mod before supersaw was added. Index +1.
-                else if (fromJummBox && beforeSix) {
+                else if ((fromJummBox && beforeSix) || (fromDogebox && beforeTwo)) {
                     if (instrumentType == InstrumentType.supersaw || instrumentType == InstrumentType.customChipWave) {
                         instrumentType += 1;
                     }
@@ -3481,7 +3481,7 @@ export class Song {
                     }
                 }
                 // Similar story, supersaw is also before custom chip (and mod, but mods can't have presets).
-                else if (fromJummBox && beforeSix) {
+                else if ((fromJummBox && beforeSix) || (fromDogebox && beforeTwo)) {
                     if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == InstrumentType.supersaw) {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.customChipWave;
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.customChipWave;
@@ -4268,7 +4268,7 @@ export class Song {
                 } else {
                     const envelopeCount: number = clamp(0, Config.maxEnvelopeCount + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     // JB v6 adds some envelope options here in the sequence.
-                    if (fromJummBox && !beforeSix) {
+                    if ((fromJummBox && !beforeSix) || (fromDogebox && !beforeTwo)) {
                         instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.discreteEnvelope = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                     }
@@ -10616,7 +10616,7 @@ export class Synth {
 	}
 
     private static fmSourceTemplate: string[] = (`
-        const sign = instrumentState.invertWave ? -1 : 1;
+        const sign = instrument.invertWave ? -1 : 1;
 		const data = synth.tempMonoInstrumentSampleBuffer;
 		const sineWave = Config.sineWave;
 			
