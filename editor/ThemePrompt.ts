@@ -33,6 +33,8 @@ export class ThemePrompt implements Prompt {
 		option({ value: "roe light" }, "Roe Light"),
 		option({ value: "energized" }, "Energized"),
 		option({ value: "neapolitan" }, "Neapolitan"),
+		option({ value: "poly" }, "Poly"),
+		option({ value: "blutonium" }, "Blutonium"),
 		option({ value: "mono" }, "Mono"),
 		option({ value: "dogebox classic" }, "Dogebox Classic"),
 		option({ value: "dogebox2" }, "Dogebox2"),
