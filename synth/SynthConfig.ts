@@ -120,6 +120,13 @@ export const enum EnvelopeComputeIndex {
     length,
 }
 
+export const enum CustomEnvelopeEndType {
+    stay,
+    repeat,
+    pingPong,
+    decay
+}
+
 /*
 export const enum InstrumentAutomationIndex {
     mixVolume,
@@ -240,6 +247,15 @@ export interface Feedback extends BeepBoxOption {
 
 export interface Envelope extends BeepBoxOption {
     readonly type: EnvelopeType;
+    readonly speed: number;
+}
+
+export interface CustomEnvelope extends BeepBoxOption {
+    readonly data: number[];
+    readonly endType: CustomEnvelopeEndType;
+    readonly stretchWithBeats: boolean;
+    readonly interpolate: boolean;
+    readonly mult: number;
     readonly speed: number;
 }
 
