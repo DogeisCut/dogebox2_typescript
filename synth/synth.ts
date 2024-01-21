@@ -3185,7 +3185,7 @@ export class Song {
                 fromJummBox = false;
                 fromDogebox = false;
             }
-        
+
 
         const version: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
         if (fromBeepBox && (version == -1 || version > Song._latestBeepboxVersion || version < Song._oldestBeepboxVersion)) return;
@@ -5199,7 +5199,7 @@ class PickedString {
 		//const decayRateEnd: number   = Math.pow(0.5, decayCurveEnd   * shelfRadians / radiansPerSampleEnd);
 		const decayRateStart: number = Math.pow(0.5, decayCurveStart * Math.pow(shelfRadians / (radiansPerSampleStart * registerShelfCenter), (1.0 + 2.0 * register)) * registerShelfCenter);
 		const decayRateEnd:   number = Math.pow(0.5, decayCurveEnd   * Math.pow(shelfRadians / (radiansPerSampleEnd   * registerShelfCenter), (1.0 + 2.0 * register)) * registerShelfCenter);
-		
+
         const expressionDecayStart: number = Math.pow(decayRateStart, 0.002);
         const expressionDecayEnd: number = Math.pow(decayRateEnd, 0.002);
 
@@ -5238,7 +5238,7 @@ class PickedString {
 			Synth.tempFilterStartCoefficients.lowPass2ndOrderButterworth(warpInfinityToNyquist(lowpass2ndOrderCutoffRadiansStart), lowpass2ndOrderGainStart);
 			Synth.tempFilterEndCoefficients  .lowPass2ndOrderButterworth(warpInfinityToNyquist(lowpass2ndOrderCutoffRadiansEnd),   lowpass2ndOrderGainEnd);
 		}
-		
+
 		synth.tempFrequencyResponse.analyze(Synth.tempFilterStartCoefficients, centerHarmonicStart);
 		const sustainFilterA1Start: number = Synth.tempFilterStartCoefficients.a[1];
 		const sustainFilterA2Start: number = Synth.tempFilterStartCoefficients.a[2];
@@ -5246,7 +5246,7 @@ class PickedString {
 		const sustainFilterB1Start: number = Synth.tempFilterStartCoefficients.b[1] * expressionDecayStart;
 		const sustainFilterB2Start: number = Synth.tempFilterStartCoefficients.b[2] * expressionDecayStart;
 		const sustainFilterPhaseDelayStart: number = -synth.tempFrequencyResponse.angle() / centerHarmonicStart;
-		
+
 		synth.tempFrequencyResponse.analyze(Synth.tempFilterEndCoefficients, centerHarmonicEnd);
 		const sustainFilterA1End: number = Synth.tempFilterEndCoefficients.a[1];
 		const sustainFilterA2End: number = Synth.tempFilterEndCoefficients.a[2];
@@ -5254,13 +5254,13 @@ class PickedString {
 		const sustainFilterB1End: number = Synth.tempFilterEndCoefficients.b[1] * expressionDecayEnd;
 		const sustainFilterB2End: number = Synth.tempFilterEndCoefficients.b[2] * expressionDecayEnd;
 		const sustainFilterPhaseDelayEnd: number = -synth.tempFrequencyResponse.angle() / centerHarmonicEnd;
-		
+
 		const periodLengthStart: number = 1.0 / phaseDeltaStart;
 		const periodLengthEnd: number = 1.0 / phaseDeltaEnd;
 		const minBufferLength: number = Math.ceil(Math.max(periodLengthStart, periodLengthEnd) * 2);
 		const delayLength: number = periodLengthStart - allPassPhaseDelayStart - sustainFilterPhaseDelayStart;
 		const delayLengthEnd: number = periodLengthEnd - allPassPhaseDelayEnd - sustainFilterPhaseDelayEnd;
-		
+
 		this.prevDelayLength = delayLength;
 		this.delayLengthDelta = (delayLengthEnd - delayLength) / roundedSamplesPerTick;
 		this.allPassG = allPassGStart;
@@ -5529,6 +5529,29 @@ class EnvelopeComputer {
                         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                     }
                 }
+                // const customEnvelopeTest: CustomEnvelope = new CustomEnvelope();
+                // const computeIndex: number = automationTarget.computeIndex + targetIndex;
+                // let envelopeStart: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, noteSecondsStart, beatTimeStart, noteSizeStart);
+                // if (prevSlideStart) {
+                //     const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, prevNoteSecondsStart, beatTimeStart, prevNoteSize);
+                //     envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
+                // }
+                // if (nextSlideStart) {
+                //     const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, 0.0, beatTimeStart, nextNoteSize);
+                //     envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
+                // }
+                // let envelopeEnd: number = envelopeStart;
+                // if (instrument.discreteEnvelope == false) {
+                //     envelopeEnd = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, noteSecondsEnd, beatTimeEnd, noteSizeEnd);
+                //     if (prevSlideEnd) {
+                //         const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize);
+                //         envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
+                //     }
+                //     if (nextSlideEnd) {
+                //         const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, 0.0, beatTimeEnd, nextNoteSize);
+                //         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
+                //     }
+                // }
 
                 this.envelopeStarts[computeIndex] *= envelopeStart;
                 this.envelopeEnds[computeIndex] *= envelopeEnd;
@@ -5618,17 +5641,17 @@ class EnvelopeComputer {
         if (values.length < 2) {
           throw new Error("Linear interpolation requires at least two values in the array.");
         }
-      
+
         // Ensure softIndex is within bounds
         softIndex = Math.max(0, Math.min(values.length - 1, softIndex));
-      
+
         // Find the two values between which the softIndex falls
         const lowerIndex = Math.floor(softIndex);
         const upperIndex = Math.ceil(softIndex);
-      
+
         const lowerValue = values[lowerIndex];
         const upperValue = values[upperIndex];
-      
+
         // Perform linear interpolation
         const t = softIndex - lowerIndex;
         return lowerValue + t * (upperValue - lowerValue);
@@ -7748,7 +7771,7 @@ export class Synth {
                     for (let instrumentIdx: number = 0; instrumentIdx < this.song.channels[channel].instruments.length; instrumentIdx++) {
                         let instrument: Instrument = this.song.channels[channel].instruments[instrumentIdx];
                         let instrumentState: InstrumentState = this.channels[channel].instruments[instrumentIdx];
-  
+
                         // Update arpeggio time, which is used to calculate arpeggio position
                         let useArpeggioSpeed: number = instrument.arpeggioSpeed;
                         if (this.isModActive(Config.modulators.dictionary["arp speed"].index, channel, instrumentIdx)) {
@@ -7954,7 +7977,7 @@ export class Synth {
             const filteredPitches = pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit)
 
             if (this.liveInputDuration > 0 && (channelIndex == this.liveInputChannel) && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
-                
+
 
                 if (instrument.getChord().singleTone) {
                     let tone: Tone;
@@ -8397,7 +8420,7 @@ export class Synth {
                             tone = toneList.get(toneCount);
                         }
                         toneCount++;
-                        
+
                         for (let i: number = 0; i < filteredPitches.length; i++) {
                             tone.pitches[i] = filteredPitches[i];
                         }
@@ -8575,7 +8598,7 @@ export class Synth {
     }
 
     private computeTone(song: Song, channelIndex: number, samplesPerTick: number, tone: Tone, released: boolean, shouldFadeOutFast: boolean): void {
-        
+
         const roundedSamplesPerTick: number = Math.ceil(samplesPerTick);
         const channel: Channel = song.channels[channelIndex];
         const channelState: ChannelState = this.channels[channelIndex];
@@ -9164,7 +9187,7 @@ export class Synth {
         } else {
             const freqEndRatio: number = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / 12.0);
 			const basePhaseDeltaScale: number = Math.pow(freqEndRatio, 1.0 / roundedSamplesPerTick);
-			
+
             let pitch: number = tone.pitches[0];
             if (tone.pitchCount > 1 && (chord.arpeggiates || chord.customInterval)) {
                 const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
@@ -9256,7 +9279,7 @@ export class Synth {
 			let supersawExpressionEnd: number = 1.0;
 			if (instrument.type == InstrumentType.supersaw) {
 				const minFirstVoiceAmplitude: number = 1.0 / Math.sqrt(Config.supersawVoiceCount);
-				
+
                 // Dynamism mods
                 let useDynamismStart: number = instrument.supersawDynamism / Config.supersawDynamismMax;
                 let useDynamismEnd: number = instrument.supersawDynamism / Config.supersawDynamismMax;
@@ -9274,14 +9297,14 @@ export class Synth {
 				const dynamismEnd:   number = Math.sqrt((1.0 / Math.pow(firstVoiceAmplitudeEnd, 2.0) - 1.0) / (Config.supersawVoiceCount - 1.0));
 				tone.supersawDynamism = dynamismStart;
 				tone.supersawDynamismDelta = (dynamismEnd - dynamismStart) / roundedSamplesPerTick;
-				
+
 				const initializeSupersaw: boolean = (tone.supersawDelayIndex == -1);
 				if (initializeSupersaw) {
 					// Goal: generate sawtooth phases such that the combined initial amplitude
 					// cancel out to minimize pop. Algorithm: generate sorted phases, iterate over
 					// their sawtooth drop points to find a combined zero crossing, then offset the
 					// phases so they start there.
-					
+
 					// Generate random phases in ascending order by adding positive randomly
 					// sized gaps between adjacent phases. For a proper distribution of random
 					// events, the gaps sizes should be an "exponential distribution", which is
@@ -9292,10 +9315,10 @@ export class Synth {
 						tone.phases[i] = accumulator;
 						accumulator += -Math.log(Math.random());
 					}
-					
+
 					const amplitudeSum: number = 1.0 + (Config.supersawVoiceCount - 1.0) * dynamismStart;
 					const slope: number = amplitudeSum;
-					
+
 					// Find the initial amplitude of the sum of sawtooths with the normalized
 					// set of phases.
 					let sample: number = 0.0;
@@ -9305,7 +9328,7 @@ export class Synth {
 						tone.phases[i] = normalizedPhase;
 						sample += (normalizedPhase - 0.5) * amplitude;
 					}
-					
+
 					// Find the phase of the zero crossing of the sum of the sawtooths. You can
 					// use a constant slope and the distance between sawtooth drops to determine if
 					// the zero crossing occurs between them. Note that a small phase means that
@@ -9331,7 +9354,7 @@ export class Synth {
 					for (let i: number = 0; i < Config.supersawVoiceCount; i++) {
 						tone.phases[i] += zeroCrossingPhase;
 					}
-					
+
 					// Randomize the (initially sorted) order of the phases (aside from the
 					// first one) so that they don't correlate to the detunes that are also
 					// based on index.
@@ -9342,7 +9365,7 @@ export class Synth {
 						tone.phases[swappedIndex] = temp;
 					}
 				}
-				
+
 				const baseSpreadSlider: number = instrument.supersawSpread / Config.supersawSpreadMax;
 				// Spread mods
 				let useSpreadStart: number = baseSpreadSlider;
@@ -9351,7 +9374,7 @@ export class Synth {
                     useSpreadStart = (this.getModValue(Config.modulators.dictionary["spread"].index, channelIndex, tone.instrumentIndex, false)) / Config.supersawSpreadMax;
                     useSpreadEnd = (this.getModValue(Config.modulators.dictionary["spread"].index, channelIndex, tone.instrumentIndex, true)) / Config.supersawSpreadMax;
                 }
-                
+
 				const spreadSliderStart: number = useSpreadStart * envelopeStarts[EnvelopeComputeIndex.supersawSpread];
 				const spreadSliderEnd:   number = useSpreadEnd * envelopeEnds[  EnvelopeComputeIndex.supersawSpread];
 				// Just use the average detune for the current tick in the below loop.
@@ -9362,7 +9385,7 @@ export class Synth {
 					const offset: number = (i == 0) ? 0.0 : Math.pow((((i + 1) >> 1) - 0.5 + 0.025 * ((i & 2) - 1)) / (Config.supersawVoiceCount >> 1), 1.1) * ((i & 1) * 2 - 1);
 					tone.supersawUnisonDetunes[i] = Math.pow(2.0, curvedSpread * offset / 12.0);
 				}
-				
+
 				const baseShape: number = instrument.supersawShape / Config.supersawShapeMax;
 				// Saw shape mods
 				let useShapeStart: number = baseShape * envelopeStarts[EnvelopeComputeIndex.supersawShape];
@@ -9376,9 +9399,9 @@ export class Synth {
 				const shapeEnd:   number = useShapeEnd * envelopeEnds[  EnvelopeComputeIndex.supersawShape];
 				tone.supersawShape = shapeStart;
 				tone.supersawShapeDelta = (shapeEnd - shapeStart) / roundedSamplesPerTick;
-				
+
 				const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth);
-				
+
                 // Check for PWM mods to this instrument
                 let pulseWidthModStart: number = basePulseWidth;
                 let pulseWidthModEnd: number = basePulseWidth;
@@ -9397,7 +9420,7 @@ export class Synth {
 				tone.supersawDelayLength = delayLengthStart;
 				tone.supersawDelayLengthDelta = (delayLengthEnd - delayLengthStart) / roundedSamplesPerTick;
 				const minBufferLength: number = Math.ceil(Math.max(delayLengthStart, delayLengthEnd)) + 2;
-				
+
 				if (tone.supersawDelayLine == null || tone.supersawDelayLine.length <= minBufferLength) {
 					// The delay line buffer will get reused for other tones so might as well
 					// start off with a buffer size that is big enough for most notes.
@@ -9418,12 +9441,12 @@ export class Synth {
 					tone.supersawDelayLine.fill(0.0);
 					tone.supersawDelayIndex = tone.supersawDelayLine.length;
 				}
-				
+
 				const pulseExpressionRatio: number = Config.pwmBaseExpression / Config.supersawBaseExpression;
 				supersawExpressionStart *= (1.0 + (pulseExpressionRatio - 1.0) * shapeStart) / Math.sqrt(1.0 + (Config.supersawVoiceCount - 1.0) * dynamismStart * dynamismStart);
 				supersawExpressionEnd *= (1.0 + (pulseExpressionRatio - 1.0) * shapeEnd) / Math.sqrt(1.0 + (Config.supersawVoiceCount - 1.0) * dynamismEnd * dynamismEnd);
 			}
-			
+
 			let expressionStart: number = settingsExpressionMult * fadeExpressionStart * chordExpressionStart * pitchExpressionStart * envelopeStarts[EnvelopeComputeIndex.noteVolume] * supersawExpressionStart;
 			let expressionEnd:   number = settingsExpressionMult * fadeExpressionEnd   * chordExpressionEnd   * pitchExpressionEnd   * envelopeEnds[  EnvelopeComputeIndex.noteVolume] * supersawExpressionEnd;
 
@@ -9529,9 +9552,9 @@ export class Synth {
                 //console.log(synthSource.join("\n"));
 
                 const wrappedFmSynth: string = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrument) => {" + synthSource.join("\n") + "}";
-				
+
 				Synth.fmSynthFunctionCache[fingerprint] = new Function("Config", "Synth", wrappedFmSynth)(Config, Synth);
-			
+
             }
             return Synth.fmSynthFunctionCache[fingerprint];
         } else if (instrument.type == InstrumentType.chip) {
@@ -9754,7 +9777,7 @@ export class Synth {
         let pickedStringFunction: Function = Synth.pickedStringFunctionCache[voiceCount];
         if (pickedStringFunction == undefined) {
             let pickedStringSource: string = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
-			
+
             pickedStringSource += `
                 const sign = instrumentState.invertWave ? -1 : 1;
 				const Config = beepbox.Config;
@@ -9787,7 +9810,7 @@ export class Synth {
 				const sustainFilterB0Delta# = +pickedString#.sustainFilterB0Delta;
 				const sustainFilterB1Delta# = +pickedString#.sustainFilterB1Delta;
 				const sustainFilterB2Delta# = +pickedString#.sustainFilterB2Delta;
-				
+
 				let expression = +tone.expression;
 				const expressionDelta = +tone.expressionDelta;
 
@@ -9813,13 +9836,13 @@ export class Synth {
 
 					allPassSample# = fractionalDelaySample# * allPassG# + allPassPrevInput# - allPassG# * allPassSample#;
 					allPassPrevInput# = fractionalDelaySample#;
-					
+
 					const sustainFilterPrevOutput1# = sustainFilterSample#;
 					sustainFilterSample# = sustainFilterB0# * allPassSample# + sustainFilterB1# * sustainFilterPrevInput1# + sustainFilterB2# * sustainFilterPrevInput2# - sustainFilterA1# * sustainFilterSample# - sustainFilterA2# * sustainFilterPrevOutput2#;
 					sustainFilterPrevOutput2# = sustainFilterPrevOutput1#;
 					sustainFilterPrevInput2# = sustainFilterPrevInput1#;
 					sustainFilterPrevInput1# = allPassSample#;
-					
+
 					delayLine#[delayIndex# & delayBufferMask#] += sustainFilterSample#;
 					delayLine#[(delayIndex# + delayResetOffset#) & delayBufferMask#] = 0.0;
 					delayIndex#++;
@@ -9873,7 +9896,7 @@ export class Synth {
 				pickedString#.sustainFilterB0 = sustainFilterB0#;
 				pickedString#.sustainFilterB1 = sustainFilterB1#;
 				pickedString#.sustainFilterB2 = sustainFilterB2#;
-				
+
 				tone.expression = expression;
 
 				synth.sanitizeFilters(filters);
@@ -10407,7 +10430,7 @@ export class Synth {
 
             if (usesPanning) {
                 effectsSource += `
-				
+
 				Synth.sanitizeDelayLine(panningDelayLine, panningDelayPos, panningMask);
 				instrumentState.panningDelayPos = panningDelayPos;
 				instrumentState.panningVolumeL = panningVolumeL;
@@ -10418,7 +10441,7 @@ export class Synth {
 
             if (usesChorus) {
                 effectsSource += `
-				
+
 				Synth.sanitizeDelayLine(chorusDelayLineL, chorusDelayPos, chorusMask);
 				Synth.sanitizeDelayLine(chorusDelayLineR, chorusDelayPos, chorusMask);
 				instrumentState.chorusPhase = chorusPhase;
@@ -10429,7 +10452,7 @@ export class Synth {
 
             if (usesEcho) {
                 effectsSource += `
-				
+
 				Synth.sanitizeDelayLine(echoDelayLineL, echoDelayPos, echoMask);
 				Synth.sanitizeDelayLine(echoDelayLineR, echoDelayPos, echoMask);
 				instrumentState.echoDelayPos = echoDelayPos;
@@ -10448,7 +10471,7 @@ export class Synth {
 
             if (usesReverb) {
                 effectsSource += `
-				
+
 				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
 				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
 				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
@@ -10473,7 +10496,7 @@ export class Synth {
 				instrumentState.reverbShelfPrevInput2 = reverbShelfPrevInput2;
 				instrumentState.reverbShelfPrevInput3 = reverbShelfPrevInput3;`
             }
-            
+
             effectsSource += "}";
 
             //console.log(effectsSource);
@@ -10557,13 +10580,13 @@ export class Synth {
     private static supersawSynth(synth: Synth, bufferIndex: number, runLength: number, tone: Tone, instrumentState: InstrumentState): void {
 		const data: Float32Array = synth.tempMonoInstrumentSampleBuffer!;
 		const voiceCount: number = Config.supersawVoiceCount|0;
-		
+
 		let phaseDelta: number = tone.phaseDeltas[0];
 		const phaseDeltaScale: number = +tone.phaseDeltaScales[0];
 		let expression: number = +tone.expression;
 		const expressionDelta: number = +tone.expressionDelta;
 		let phases: number[] = tone.phases;
-		
+
 		let dynamism: number = +tone.supersawDynamism;
 		const dynamismDelta: number = +tone.supersawDynamismDelta;
 		const unisonDetunes: number[] = tone.supersawUnisonDetunes;
@@ -10575,21 +10598,21 @@ export class Synth {
 		const delayBufferMask: number = (delayLine.length - 1) >> 0;
 		let delayIndex: number = tone.supersawDelayIndex|0;
 		delayIndex = (delayIndex & delayBufferMask) + delayLine.length;
-		
+
 		const filters: DynamicBiquadFilter[] = tone.noteFilters;
 		const filterCount: number = tone.noteFilterCount|0;
 		let initialFilterInput1: number = +tone.initialNoteFilterInput1;
 		let initialFilterInput2: number = +tone.initialNoteFilterInput2;
 		const applyFilters: Function = Synth.applyFilters;
-		
+
 		const stopIndex: number = bufferIndex + runLength;
 		for (let sampleIndex: number = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
 			// The phase initially starts at a zero crossing so apply
 			// the delta before first sample to get a nonzero value.
 			let phase: number = (phases[0] + phaseDelta) % 1.0;
 			let supersawSample: number = phase - 0.5 * (1.0 + (voiceCount - 1.0) * dynamism);
-			
-			// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing. 
+
+			// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing.
             if (!instrumentState.aliases) {
                 if (phase < phaseDelta) {
                     var t: number = phase / phaseDelta;
@@ -10599,17 +10622,17 @@ export class Synth {
                     supersawSample -= (t + t + t * t + 1) * 0.5;
                 }
             }
-			
+
 			phases[0] = phase;
-			
+
 			for (let i: number = 1; i < voiceCount; i++) {
 				const detunedPhaseDelta: number = phaseDelta * unisonDetunes[i];
 				// The phase initially starts at a zero crossing so apply
 				// the delta before first sample to get a nonzero value.
 				let phase: number = (phases[i] + detunedPhaseDelta) % 1.0;
 				supersawSample += phase * dynamism;
-				
-				// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing. 
+
+				// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing.
                 if (!instrumentState.aliases) {
                     if (phase < detunedPhaseDelta) {
                         const t: number = phase / detunedPhaseDelta;
@@ -10619,10 +10642,10 @@ export class Synth {
                         supersawSample -= (t + t + t * t + 1) * 0.5 * dynamism;
                     }
                 }
-				
+
 				phases[i] = phase;
 			}
-			
+
 			delayLine[delayIndex & delayBufferMask] = supersawSample;
 			const delaySampleTime: number = delayIndex - delayLength;
 			const lowerIndex: number = delaySampleTime | 0;
@@ -10632,30 +10655,30 @@ export class Synth {
 			const nextDelaySample: number = delayLine[upperIndex & delayBufferMask];
 			const delaySample: number = prevDelaySample + (nextDelaySample - prevDelaySample) * delayRatio;
 			delayIndex++;
-			
+
 			const inputSample: number = supersawSample - delaySample * shape;
 			const sample: number = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
 			initialFilterInput2 = initialFilterInput1;
 			initialFilterInput1 = inputSample;
-			
+
 			phaseDelta *= phaseDeltaScale;
 			dynamism += dynamismDelta;
 			shape += shapeDelta;
 			delayLength += delayLengthDelta;
-			
+
 			const output: number = sample * expression;
 			expression += expressionDelta;
-			
+
 			data[sampleIndex] += output;
 		}
-		
+
 		tone.phaseDeltas[0] = phaseDelta;
 		tone.expression = expression;
 		tone.supersawDynamism = dynamism;
 		tone.supersawShape = shape;
 		tone.supersawDelayLength = delayLength;
 		tone.supersawDelayIndex = delayIndex;
-		
+
 		synth.sanitizeFilters(filters);
 		tone.initialNoteFilterInput1 = initialFilterInput1;
 		tone.initialNoteFilterInput2 = initialFilterInput2;
@@ -10665,7 +10688,7 @@ export class Synth {
         const sign = instrument.invertWave ? -1 : 1;
 		const data = synth.tempMonoInstrumentSampleBuffer;
 		const sineWave = Config.sineWave;
-			
+
 		// I'm adding 1000 to the phase to ensure that it's never negative even when modulated by other waves because negative numbers don't work with the modulus operator very well.
 		let operator#Phase       = +((tone.phases[#] % 1) + 1000) * ` + Config.sineWaveLength + `;
 		let operator#PhaseDelta  = +tone.phaseDeltas[#] * ` + Config.sineWaveLength + `;
@@ -10684,7 +10707,7 @@ export class Synth {
 		let initialFilterInput1 = +tone.initialNoteFilterInput1;
 		let initialFilterInput2 = +tone.initialNoteFilterInput2;
 		const applyFilters = Synth.applyFilters;
-		
+
 		const stopIndex = bufferIndex + roundedSamplesPerTick;
 		for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
 				// INSERT OPERATOR COMPUTATION HERE
