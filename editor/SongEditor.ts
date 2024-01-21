@@ -499,7 +499,7 @@ export class SongEditor {
 	private readonly _supersawSpreadRow: HTMLDivElement = div({class: "selectRow"}, span({class: "tip", onclick: ()=>this._openPrompt("supersawSpread")}, "Spread:"), this._supersawSpreadSlider.container);
 	private readonly _supersawShapeSlider: Slider = new Slider(input({style: "margin: 0;", type: "range", min: "0", max: Config.supersawShapeMax, value: "0", step: "1"}), this._doc, (oldValue: number, newValue: number) => new ChangeSupersawShape(this._doc, oldValue, newValue), false);
 	private readonly _supersawShapeRow: HTMLDivElement = div({class: "selectRow"}, span({class: "tip", onclick: ()=>this._openPrompt("supersawShape"), style: "overflow: clip;"}, "Saw↔Pulse:"), this._supersawShapeSlider.container);
-	
+
     private readonly _noteFilterSimpleCutSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimpleCutRange - 1, value: "6", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeNoteFilterSimpleCut(this._doc, oldValue, newValue), false);
     private _noteFilterSimpleCutRow: HTMLDivElement = div({ class: "selectRow", title: "Low-pass Filter Cutoff Frequency" }, span({ class: "tip", onclick: () => this._openPrompt("filterCutoff") }, "Filter Cut:"), this._noteFilterSimpleCutSlider.container);
     private readonly _noteFilterSimplePeakSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeNoteFilterSimplePeak(this._doc, oldValue, newValue), false);
@@ -576,7 +576,7 @@ export class SongEditor {
     private readonly _envelopeSpeedRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("envelopeSpeed") }, "‣ Spd:"), this._envelopeSpeedDisplay, this._envelopeSpeedSlider.container);
     private readonly _envelopeDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._discreteEnvelopeRow, this._envelopeSpeedRow);
     private readonly _envelopeDropdown: HTMLButtonElement = button({ style: "margin-left:0em; margin-right: 1em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Envelope) }, "▼");
-   
+
     private readonly _drumsetGroup: HTMLElement = div({ class: "editor-controls" });
     private readonly _modulatorGroup: HTMLElement = div({ class: "editor-controls" });
     private readonly _modNameRows: HTMLElement[];
@@ -595,7 +595,7 @@ export class SongEditor {
     private readonly _upperNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "Upper Note Limit:"), this._upperNoteLimitInputBox);
     private readonly _lowerNoteLimitInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
     private readonly _lowerNoteLimitRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("lowerNoteLimit") }, "Lower Note Limit:"), this._lowerNoteLimitInputBox);
-    
+
     private readonly _instrumentCopyButton: HTMLButtonElement = button({ style: "max-width:86px; width: 86px;", class: "copyButton", title: "Copy Instrument (⇧C)" }, [
         "Copy",
         // Copy icon:
@@ -1501,7 +1501,7 @@ export class SongEditor {
 					this.prompt = new SustainPrompt(this._doc);
 					break;
                 case "exportInstrument":
-                    this.prompt = new InstrumentExportPrompt(this._doc, this);
+                    this.prompt = new InstrumentExportPrompt(this._doc);
                     break;
                 case "importInstrument":
                     this.prompt = new InstrumentImportPrompt(this._doc);//, this);
@@ -3329,11 +3329,11 @@ export class SongEditor {
                         // Auto set the used instruments to the ones you were most recently viewing.
                         if (this._doc.channel >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
                         {
-                           
+
                                 this._doc.viewedInstrument[this._doc.channel] = this._doc.recentPatternInstruments[this._doc.channel][0];
                         }
                         group.append(new ChangeSetPatternInstruments(this._doc, this._doc.channel, this._doc.recentPatternInstruments[this._doc.channel],  this._doc.song.channels[this._doc.channel].patterns[nextEmpty-1]));
-                        
+
                     }
                 }
                 else {
@@ -3353,7 +3353,7 @@ export class SongEditor {
 
                         // Change pattern number to lowest-index unused
                         group.append(new ChangePatternNumbers(this._doc, nextUnused, this._doc.bar, this._doc.channel, 1, 1));
-                        
+
                         // Auto set the used instruments to the ones you were most recently viewing.
                         if (this._doc.channel >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
                         {
