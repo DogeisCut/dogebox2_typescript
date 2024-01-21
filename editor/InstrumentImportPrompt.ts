@@ -40,12 +40,16 @@ export class InstrumentImportPrompt implements Prompt {
 	);
 
 	constructor(private _doc: SongDocument) {
-		this._fileInput.addEventListener("change", this._whenFileSelected);
-		this._cancelButton.addEventListener("click", this._close);
+
 		if ((_doc.song.patternInstruments||_doc.song.layeredInstruments)==false) {
 			this._importStrategySelect.disabled = true;
 			this._importStrategySelect.value = "replace";
+		} else {
+			const lastStrategy: string | null = window.localStorage.getItem("instrumentImportStrategy");
+			if (lastStrategy != null) this._importStrategySelect.value = lastStrategy;
 		}
+		this._fileInput.addEventListener("change", this._whenFileSelected);
+		this._cancelButton.addEventListener("click", this._close);
 	}
 
 		private _whenFileSelected = (): void => {
@@ -87,13 +91,14 @@ export class InstrumentImportPrompt implements Prompt {
 			const currentInstrum: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
 			switch (this._importStrategySelect.value) {
 				case "replace":
-					console.log("multi replace");
+					// console.log("multi replace");
+					window.localStorage.setItem("instrumentImportStrategy", this._importStrategySelect.value);
 					//Replace the current instrument with the first one, then add the rest
 					const firstInstrum = file[0];
 					this._doc.record(new ChangePasteInstrument(this._doc, currentInstrum, firstInstrum));
 					for (let i = 1; i < file.length; i++) {
 						const insturm: any = file[i];
-						if (!this._validate_instrument_limit(channel)) { 
+						if (!this._validate_instrument_limit(channel)) {
 							alert("Max instruments reached! Some instruments were not imported.");
 							break;
 						}
@@ -104,11 +109,12 @@ export class InstrumentImportPrompt implements Prompt {
 					this._doc.notifier.changed();
 					return;
 				case "all":
-					console.log("multi all");
+					// console.log("multi all");
+					window.localStorage.setItem("instrumentImportStrategy", this._importStrategySelect.value);
 					//Delete all instruments then add these ones
 					channel.instruments.length = 0;
 					for (let insturm of file) {
-						if (!this._validate_instrument_limit(channel)) { 
+						if (!this._validate_instrument_limit(channel)) {
 							alert("Max instruments reached! Some instruments were not imported.");
 							break;
 						}
@@ -119,10 +125,11 @@ export class InstrumentImportPrompt implements Prompt {
 					this._doc.notifier.changed();
 					return;
 				default:
-					console.log("multi append");
+					// console.log("multi append");
+					window.localStorage.setItem("instrumentImportStrategy", this._importStrategySelect.value);
 					//Add these instruments
 					for (let insturm of file) {
-						if (!this._validate_instrument_limit(channel)) { 
+						if (!this._validate_instrument_limit(channel)) {
 							alert("Max instruments reached! Some instruments were not imported.");
 							break;
 						}
@@ -149,7 +156,8 @@ export class InstrumentImportPrompt implements Prompt {
 			switch (this._importStrategySelect.value) {
 				case "replace":
 					//Replace the current instrument with this one
-					console.log("single replace");
+					// console.log("single replace");
+					window.localStorage.setItem("instrumentImportStrategy", this._importStrategySelect.value);
 					this._doc.record(new ChangePasteInstrument(this._doc, currentInstrum, file));
 					this._doc.record(new ChangeViewInstrument(this._doc, this._doc.getCurrentInstrument()))
 					this._doc.prompt = null;
@@ -157,7 +165,8 @@ export class InstrumentImportPrompt implements Prompt {
 					return;
 				case "all":
 					//Delete all instruments then add this one
-					console.log("single all");
+					// console.log("single all");
+					window.localStorage.setItem("instrumentImportStrategy", this._importStrategySelect.value);
 					channel.instruments.length = 1;
 					const firstInstrum = channel.instruments[0];
 					this._doc.record(new ChangePasteInstrument(this._doc, firstInstrum, file));
@@ -168,7 +177,8 @@ export class InstrumentImportPrompt implements Prompt {
 				default:
 					//Add this instrument
 					if (!this._validate_instrument_limit(channel)) { alert("Max instruments reached! The instrument was not imported."); this._doc.prompt = null; return; }
-					console.log("single append");
+					// console.log("single append");
+					window.localStorage.setItem("instrumentImportStrategy", this._importStrategySelect.value);
 					this._doc.record(new ChangeAppendInstrument(this._doc, channel, file));
 					this._doc.record(new ChangeViewInstrument(this._doc, channel.instruments.length-1))
 					this._doc.prompt = null;

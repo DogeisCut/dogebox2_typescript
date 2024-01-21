@@ -3845,7 +3845,7 @@ export class Song {
                 fromJummBox = false;
                 fromDogebox = false;
             }
-        
+
 
         const version: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
         if (fromBeepBox && (version == -1 || version > Song._latestBeepboxVersion || version < Song._oldestBeepboxVersion)) return;
@@ -6834,7 +6834,7 @@ class PickedString {
 		//const decayRateEnd: number   = Math.pow(0.5, decayCurveEnd   * shelfRadians / radiansPerSampleEnd);
 		const decayRateStart: number = Math.pow(0.5, decayCurveStart * Math.pow(shelfRadians / (radiansPerSampleStart * registerShelfCenter), (1.0 + 2.0 * register)) * registerShelfCenter);
 		const decayRateEnd:   number = Math.pow(0.5, decayCurveEnd   * Math.pow(shelfRadians / (radiansPerSampleEnd   * registerShelfCenter), (1.0 + 2.0 * register)) * registerShelfCenter);
-        
+
         const expressionDecayStart: number = Math.pow(decayRateStart, 0.002);
         const expressionDecayEnd: number = Math.pow(decayRateEnd, 0.002);
 
@@ -7179,6 +7179,29 @@ class EnvelopeComputer {
                         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                     }
                 }
+                // const customEnvelopeTest: CustomEnvelope = new CustomEnvelope();
+                // const computeIndex: number = automationTarget.computeIndex + targetIndex;
+                // let envelopeStart: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, noteSecondsStart, beatTimeStart, noteSizeStart);
+                // if (prevSlideStart) {
+                //     const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, prevNoteSecondsStart, beatTimeStart, prevNoteSize);
+                //     envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
+                // }
+                // if (nextSlideStart) {
+                //     const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, 0.0, beatTimeStart, nextNoteSize);
+                //     envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
+                // }
+                // let envelopeEnd: number = envelopeStart;
+                // if (instrument.discreteEnvelope == false) {
+                //     envelopeEnd = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, noteSecondsEnd, beatTimeEnd, noteSizeEnd);
+                //     if (prevSlideEnd) {
+                //         const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize);
+                //         envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
+                //     }
+                //     if (nextSlideEnd) {
+                //         const other: number = EnvelopeComputer.computeCustomEnvelope(customEnvelopeTest, 0.0, beatTimeEnd, nextNoteSize);
+                //         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
+                //     }
+                // }
 
                 this.envelopeStarts[computeIndex] *= envelopeStart;
                 this.envelopeEnds[computeIndex] *= envelopeEnd;
@@ -7271,17 +7294,17 @@ class EnvelopeComputer {
         if (values.length < 2) {
           throw new Error("Linear interpolation requires at least two values in the array.");
         }
-      
+
         // Ensure softIndex is within bounds
         softIndex = Math.max(0, Math.min(values.length - 1, softIndex));
-      
+
         // Find the two values between which the softIndex falls
         const lowerIndex = Math.floor(softIndex);
         const upperIndex = Math.ceil(softIndex);
-      
+
         const lowerValue = values[lowerIndex];
         const upperValue = values[upperIndex];
-      
+
         // Perform linear interpolation
         const t = softIndex - lowerIndex;
         return lowerValue + t * (upperValue - lowerValue);
@@ -9702,8 +9725,8 @@ export class Synth {
             const instrument: Instrument = channel.instruments[instrumentIndex];
             const filteredPitches = pitches.filter(pitch => pitch >= instrument.lowerNoteLimit && pitch <= instrument.upperNoteLimit)
 
-            if (this.liveInputDuration > 0 && channelIndex == this.liveInputChannel && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
-                
+            if (this.liveInputDuration > 0 && (channelIndex == this.liveInputChannel) && pitches.length > 0 && this.liveInputInstruments.indexOf(instrumentIndex) != -1) {
+
 
                 if (instrument.getChord().singleTone) {
                     let tone: Tone;
@@ -10146,7 +10169,7 @@ export class Synth {
                             tone = toneList.get(toneCount);
                         }
                         toneCount++;
-                        
+
                         for (let i: number = 0; i < filteredPitches.length; i++) {
                             tone.pitches[i] = filteredPitches[i];
                         }
@@ -10324,7 +10347,7 @@ export class Synth {
     }
 
     private computeTone(song: Song, channelIndex: number, samplesPerTick: number, tone: Tone, released: boolean, shouldFadeOutFast: boolean): void {
-        
+
         const roundedSamplesPerTick: number = Math.ceil(samplesPerTick);
         const channel: Channel = song.channels[channelIndex];
         const channelState: ChannelState = this.channels[channelIndex];
@@ -10960,7 +10983,6 @@ export class Synth {
             const freqEndRatio: number = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / 12.0);
 			const basePhaseDeltaScale: number = Math.pow(freqEndRatio, 1.0 / roundedSamplesPerTick);
 
-
             let pitch: number = tone.pitches[0];
             if (tone.pitchCount > 1 && (chord.arpeggiates || chord.customInterval)) {
                 const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
@@ -11190,17 +11212,7 @@ export class Synth {
 				tone.supersawShape = shapeStart;
 				tone.supersawShapeDelta = (shapeEnd - shapeStart) / roundedSamplesPerTick;
 
-                //decimal offset mods
-                let decimalOffsetModStart: number = instrument.decimalOffset;
-                if (this.isModActive(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex)) {
-                    decimalOffsetModStart = this.getModValue(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex, false);
-                }
- 
-                const decimalOffsetStart: number = decimalOffsetModStart * envelopeStarts[EnvelopeComputeIndex.decimalOffset];
-                // ...is including tone.decimalOffset still necessary?
-                tone.decimalOffset = decimalOffsetStart;
-
-                const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth);
+				const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth);
 
                 // Check for PWM mods to this instrument
                 let pulseWidthModStart: number = basePulseWidth;
@@ -11972,7 +11984,6 @@ export class Synth {
         if (pickedStringFunction == undefined) {
             let pickedStringSource: string = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
 
-
             pickedStringSource += `
                 const sign = instrumentState.invertWave ? -1 : 1;
 				const Config = beepbox.Config;
@@ -12000,9 +12011,11 @@ export class Synth {
 				let sustainFilterB1# = +pickedString#.sustainFilterB1;
 				let sustainFilterB2# = +pickedString#.sustainFilterB2;
 				const allPassGDelta# = +pickedString#.allPassGDelta;
-				const shelfA1Delta# = +pickedString#.shelfA1Delta;
-				const shelfB0Delta# = +pickedString#.shelfB0Delta;
-				const shelfB1Delta# = +pickedString#.shelfB1Delta;
+				const sustainFilterA1Delta# = +pickedString#.sustainFilterA1Delta;
+				const sustainFilterA2Delta# = +pickedString#.sustainFilterA2Delta;
+				const sustainFilterB0Delta# = +pickedString#.sustainFilterB0Delta;
+				const sustainFilterB1Delta# = +pickedString#.sustainFilterB1Delta;
+				const sustainFilterB2Delta# = +pickedString#.sustainFilterB2Delta;
 
 				let expression = +tone.expression;
 				const expressionDelta = +tone.expressionDelta;
@@ -12030,10 +12043,13 @@ export class Synth {
 					allPassSample# = fractionalDelaySample# * allPassG# + allPassPrevInput# - allPassG# * allPassSample#;
 					allPassPrevInput# = fractionalDelaySample#;
 
-					shelfSample# = shelfB0# * allPassSample# + shelfB1# * shelfPrevInput# - shelfA1# * shelfSample#;
-					shelfPrevInput# = allPassSample#;
+					const sustainFilterPrevOutput1# = sustainFilterSample#;
+					sustainFilterSample# = sustainFilterB0# * allPassSample# + sustainFilterB1# * sustainFilterPrevInput1# + sustainFilterB2# * sustainFilterPrevInput2# - sustainFilterA1# * sustainFilterSample# - sustainFilterA2# * sustainFilterPrevOutput2#;
+					sustainFilterPrevOutput2# = sustainFilterPrevOutput1#;
+					sustainFilterPrevInput2# = sustainFilterPrevInput1#;
+					sustainFilterPrevInput1# = allPassSample#;
 
-					delayLine#[delayIndex# & delayBufferMask#] += shelfSample#;
+					delayLine#[delayIndex# & delayBufferMask#] += sustainFilterSample#;
 					delayLine#[(delayIndex# + delayResetOffset#) & delayBufferMask#] = 0.0;
 					delayIndex#++;
 
@@ -12081,9 +12097,11 @@ export class Synth {
 				pickedString#.delayIndex = delayIndex#;
 				pickedString#.prevDelayLength = delayLength#;
 				pickedString#.allPassG = allPassG#;
-				pickedString#.shelfA1 = shelfA1#;
-				pickedString#.shelfB0 = shelfB0#;
-				pickedString#.shelfB1 = shelfB1#;
+				pickedString#.sustainFilterA1 = sustainFilterA1#;
+				pickedString#.sustainFilterA2 = sustainFilterA2#;
+				pickedString#.sustainFilterB0 = sustainFilterB0#;
+				pickedString#.sustainFilterB1 = sustainFilterB1#;
+				pickedString#.sustainFilterB2 = sustainFilterB2#;
 
 				tone.expression = expression;
 
@@ -12619,7 +12637,7 @@ export class Synth {
             if (usesPanning) {
                 effectsSource += `
 
-				beepbox.Synth.sanitizeDelayLine(panningDelayLine, panningDelayPos, panningMask);
+				Synth.sanitizeDelayLine(panningDelayLine, panningDelayPos, panningMask);
 				instrumentState.panningDelayPos = panningDelayPos;
 				instrumentState.panningVolumeL = panningVolumeL;
 				instrumentState.panningVolumeR = panningVolumeR;
@@ -12630,8 +12648,8 @@ export class Synth {
             if (usesChorus) {
                 effectsSource += `
 
-				beepbox.Synth.sanitizeDelayLine(chorusDelayLineL, chorusDelayPos, chorusMask);
-				beepbox.Synth.sanitizeDelayLine(chorusDelayLineR, chorusDelayPos, chorusMask);
+				Synth.sanitizeDelayLine(chorusDelayLineL, chorusDelayPos, chorusMask);
+				Synth.sanitizeDelayLine(chorusDelayLineR, chorusDelayPos, chorusMask);
 				instrumentState.chorusPhase = chorusPhase;
 				instrumentState.chorusDelayPos = chorusDelayPos;
 				instrumentState.chorusVoiceMult = chorusVoiceMult;
@@ -12641,8 +12659,8 @@ export class Synth {
             if (usesEcho) {
                 effectsSource += `
 
-				beepbox.Synth.sanitizeDelayLine(echoDelayLineL, echoDelayPos, echoMask);
-				beepbox.Synth.sanitizeDelayLine(echoDelayLineR, echoDelayPos, echoMask);
+				Synth.sanitizeDelayLine(echoDelayLineL, echoDelayPos, echoMask);
+				Synth.sanitizeDelayLine(echoDelayLineR, echoDelayPos, echoMask);
 				instrumentState.echoDelayPos = echoDelayPos;
 				instrumentState.echoMult = echoMult;
 				instrumentState.echoDelayOffsetRatio = echoDelayOffsetRatio;
@@ -12660,10 +12678,10 @@ export class Synth {
             if (usesReverb) {
                 effectsSource += `
 
-				beepbox.Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
-				beepbox.Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
-				beepbox.Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
-				beepbox.Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
+				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos        , reverbMask);
+				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  3041, reverbMask);
+				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos +  6426, reverbMask);
+				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
 				instrumentState.reverbDelayPos = reverbDelayPos;
 				instrumentState.reverbMult = reverb;
 
@@ -12827,7 +12845,7 @@ export class Synth {
 			let phase: number = (phases[0] + phaseDelta) % 1.0;
 			let supersawSample: number = phase - 0.5 * (1.0 + (voiceCount - 1.0) * dynamism);
 
-			// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing. 
+			// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing.
             if (!instrumentState.aliases) {
                 if (phase < phaseDelta) {
                     var t: number = phase / phaseDelta;
@@ -12847,7 +12865,7 @@ export class Synth {
 				let phase: number = (phases[i] + detunedPhaseDelta) % 1.0;
 				supersawSample += phase * dynamism;
 
-				// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing. 
+				// This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing.
                 if (!instrumentState.aliases) {
                     if (phase < detunedPhaseDelta) {
                         const t: number = phase / detunedPhaseDelta;
@@ -12902,7 +12920,7 @@ export class Synth {
     private static fmSourceTemplate: string[] = (`
         const sign = instrument.invertWave ? -1 : 1;
 		const data = synth.tempMonoInstrumentSampleBuffer;
-		const sineWave = beepbox.Config.sineWave;
+		const sineWave = Config.sineWave;
 
 		// I'm adding 1000 to the phase to ensure that it's never negative even when modulated by other waves because negative numbers don't work with the modulus operator very well.
 		let operator#Phase       = +((tone.phases[#] % 1) + 1000) * ` + Config.sineWaveLength + `;
@@ -12921,7 +12939,7 @@ export class Synth {
 		const filterCount = tone.noteFilterCount|0;
 		let initialFilterInput1 = +tone.initialNoteFilterInput1;
 		let initialFilterInput2 = +tone.initialNoteFilterInput2;
-		const applyFilters = beepbox.Synth.applyFilters;
+		const applyFilters = Synth.applyFilters;
 
 		const stopIndex = bufferIndex + roundedSamplesPerTick;
 		for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
