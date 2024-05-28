@@ -492,6 +492,20 @@ export class TipPrompt implements Prompt {
 					p("Defines the lower limit in which notes will play, useful for advanced instruments."),
 				);
 			} break;
+			case "hzOffset": {
+				message = div(
+					h2("Hz Offset"),
+					p("Allows you to input a fixed frequency, regardless of the note’s pitch. This is different from the standard frequency input, which is a proportional multiplier of the note’s pitch."),
+					p("Previously, ~1x would have this set to 1.5, and ~2x would have it set to -1.3, see the next option for further accuracy.")
+				);
+			} break;
+			case "fmInvert": {
+				message = div(
+					h2("Invert"),
+					p("Flips the wave of the frequency, if combined with an hz offset, it can allow for a phaser effect."),
+					p("Previously, frequency options containing the tidle (e.g. ~1x, ~2x) would have this enabled.")
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#

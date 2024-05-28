@@ -66,6 +66,9 @@ export class Layout {
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
+				.selectRow {
+					width: 100%;
+				}
 				.beepboxEditor .operatorRow {
 					heiht: 2em;
 				}
