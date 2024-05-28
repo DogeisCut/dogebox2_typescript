@@ -10863,13 +10863,13 @@ export class Synth {
 
                 const associatedCarrierIndex: number = (instrument.type == InstrumentType.fm6op ? instrument.customAlgorithm.associatedCarrier[i]-1:Config.algorithms[instrument.algorithm].associatedCarrier[i] - 1);
                 const pitch: number = tone.pitches[arpeggiates ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))];
-                const freqMult = Config.operatorFrequencies[instrument.operators[i].frequency].mult;
+                const freqMult = instrument.operators[i].frequency
                 const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
                 const pitchStart: number = trueBasePitch + (pitch + intervalStart) * intervalScale + interval;
                 const pitchEnd: number = trueBasePitch + (pitch + intervalEnd) * intervalScale + interval;
                 const baseFreqStart: number = Instrument.frequencyFromPitch(pitchStart);
                 const baseFreqEnd: number = Instrument.frequencyFromPitch(pitchEnd);
-                const hzOffset: number = Config.operatorFrequencies[instrument.operators[i].frequency].hzOffset;
+                const hzOffset: number = 0.0//Config.operatorFrequencies[instrument.operators[i].frequency].hzOffset;
                 const targetFreqStart: number = freqMult * baseFreqStart + hzOffset;
                 const targetFreqEnd: number = freqMult * baseFreqEnd + hzOffset;
 
@@ -10904,8 +10904,8 @@ export class Synth {
 
                 const amplitudeCurveStart: number = Synth.operatorAmplitudeCurve(amplitudeStart);
                 const amplitudeCurveEnd: number = Synth.operatorAmplitudeCurve(amplitudeEnd);
-                const amplitudeMultStart: number = amplitudeCurveStart * Config.operatorFrequencies[instrument.operators[i].frequency].amplitudeSign;
-                const amplitudeMultEnd: number = amplitudeCurveEnd * Config.operatorFrequencies[instrument.operators[i].frequency].amplitudeSign;
+                const amplitudeMultStart: number = amplitudeCurveStart * 1//Config.operatorFrequencies[instrument.operators[i].frequency].amplitudeSign;
+                const amplitudeMultEnd: number = amplitudeCurveEnd * 1//Config.operatorFrequencies[instrument.operators[i].frequency].amplitudeSign;
 
                 let expressionStart: number = amplitudeMultStart;
                 let expressionEnd: number = amplitudeMultEnd;
@@ -12811,6 +12811,7 @@ export class Synth {
     }
 
     private static supersawSynth(synth: Synth, bufferIndex: number, runLength: number, tone: Tone, instrumentState: InstrumentState): void {
+        const sign: number = instrumentState.invertWave ? -1 : 1;
 		const data: Float32Array = synth.tempMonoInstrumentSampleBuffer!;
 		const voiceCount: number = Config.supersawVoiceCount|0;
 
@@ -12899,7 +12900,7 @@ export class Synth {
 			shape += shapeDelta;
 			delayLength += delayLengthDelta;
 
-			const output: number = sample * expression;
+			const output: number = sample * expression * sign;
 			expression += expressionDelta;
 
 			data[sampleIndex] += output;

@@ -1380,11 +1380,15 @@ export class SongEditor {
     private _deactivatedInstruments: boolean = false;
     private readonly _operatorRows: HTMLDivElement[] = [];
     private readonly _operatorAmplitudeSliders: Slider[] = [];
-    private readonly _operatorFrequencySelects: HTMLSelectElement[] = [];
+    private readonly _operatorFrequencySelects: HTMLInputElement[] = [];
     private readonly _operatorDropdowns: HTMLButtonElement[] = [];
     private readonly _operatorWaveformSelects: HTMLSelectElement[] = [];
     private readonly _operatorWaveformHints: HTMLSpanElement[] = [];
     private readonly _operatorWaveformPulsewidthSliders: Slider[] = [];
+    private readonly _operatorHzOffsetInputs: HTMLInputElement[] = [];
+    private readonly _operatorHzOffsetHints: HTMLSpanElement[] = [];
+    private readonly _operatorInvertCheckboxes: HTMLInputElement[] = [];
+    private readonly _operatorInvertHints: HTMLSpanElement[] = [];
     private readonly _operatorDropdownRows: HTMLElement[] = []
     private readonly _operatorDropdownGroups: HTMLDivElement[] = [];
     private readonly _drumsetSpectrumEditors: SpectrumEditor[] = [];
@@ -1450,15 +1454,21 @@ export class SongEditor {
         for (let i: number = 0; i < Config.operatorCount+2; i++) {
             const operatorIndex: number = i;
             const operatorNumber: HTMLDivElement = div({ style: "margin-right: 0px; color: " + ColorConfig.secondaryText + ";" }, i + 1 + "");
-            const frequencySelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Frequency" }), Config.operatorFrequencies.map(freq => freq.name));
+            const frequencySelect: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "frequencySelect", type: "number", step: "1", min: "-1000", max: "1000", value: "1" });
             const amplitudeSlider: Slider = new Slider(input({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Volume" }), this._doc, (oldValue: number, newValue: number) => new ChangeOperatorAmplitude(this._doc, operatorIndex, oldValue, newValue), false);
             const waveformSelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Waveform" }), Config.operatorWaves.map(wave => wave.name));
             const waveformDropdown: HTMLButtonElement = button({ style: "margin-left:0em; margin-right: 2px; height:1.5em; width: 8px; max-width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.FM, i) }, "▼");
             const waveformDropdownHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("operatorWaveform") }, "Wave:");
+            const hzOffsetInputHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("hzOffset") }, "Hz Offset:");
+            const hzOffsetInput: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "hzOffsetInput", type: "number", step: "0.1", min: "-10", max: "10", value: "0" });
+            const invertInputHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("fmInvert") }, "Invert:");
+            const invertInput: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
             const waveformPulsewidthSlider: Slider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "Pulse Width" }), this._doc, (oldValue: number, newValue: number) => new ChangeOperatorPulseWidth(this._doc, operatorIndex, oldValue, newValue), true);
             const waveformDropdownRow: HTMLElement = div({ class: "selectRow" }, waveformDropdownHint, waveformPulsewidthSlider.container,
                 div({ class: "selectContainer", style: "width: 6em; margin-left: .3em;" }, waveformSelect));
-            const waveformDropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, waveformDropdownRow);
+            const waveformDropdownHzOffsetRow: HTMLElement = div({ class: "selectRow" }, hzOffsetInputHint, hzOffsetInput);  
+            const waveformDropdownInvertRow: HTMLElement = div({ class: "selectRow" }, invertInputHint, invertInput);  
+            const waveformDropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, waveformDropdownRow, waveformDropdownHzOffsetRow, waveformDropdownInvertRow);
             const row: HTMLDivElement = div({ class: "selectRow" },
                 operatorNumber,
                 waveformDropdown,
@@ -1471,6 +1481,10 @@ export class SongEditor {
             this._operatorFrequencySelects[i] = frequencySelect;
             this._operatorDropdowns[i] = waveformDropdown;
             this._operatorWaveformHints[i] = waveformDropdownHint;
+            this._operatorHzOffsetInputs[i] = hzOffsetInput;
+            this._operatorHzOffsetHints[i] = hzOffsetInputHint;
+            this._operatorInvertCheckboxes[i] = invertInput;
+            this._operatorInvertHints[i] = invertInputHint;
             this._operatorWaveformSelects[i] = waveformSelect;
             this._operatorWaveformPulsewidthSliders[i] = waveformPulsewidthSlider;
             this._operatorDropdownRows[i] = waveformDropdownRow;
@@ -1483,7 +1497,7 @@ export class SongEditor {
             });
 
             frequencySelect.addEventListener("change", () => {
-                this._doc.record(new ChangeOperatorFrequency(this._doc, operatorIndex, frequencySelect.selectedIndex));
+                this._doc.record(new ChangeOperatorFrequency(this._doc, operatorIndex, parseFloat(frequencySelect.value)));
             });
         }
 
@@ -2536,7 +2550,7 @@ export class SongEditor {
                 for (let i: number = 0; i < Config.operatorCount + (instrument.type == InstrumentType.fm6op? 2 : 0); i++) {
                     const isCarrier: boolean = instrument.type == InstrumentType.fm ? (i < Config.algorithms[instrument.algorithm].carrierCount): (i < instrument.customAlgorithm.carrierCount);
                     this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
-                    setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);
+                    this._operatorFrequencySelects[i].value = instrument.operators[i].frequency.toString();
                     this._operatorAmplitudeSliders[i].updateValue(instrument.operators[i].amplitude);
                     setSelectedValue(this._operatorWaveformSelects[i], instrument.operators[i].waveform);
                     this._operatorWaveformPulsewidthSliders[i].updateValue(instrument.operators[i].pulseWidth);
