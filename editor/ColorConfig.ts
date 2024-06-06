@@ -3215,7 +3215,7 @@ export class ColorConfig {
     public static readonly pitchBackground: string = "var(--pitch-background)";
     public static readonly tonic: string = "var(--tonic)";
     public static readonly fifthNote: string = "var(--fifth-note)";
-    public static readonly thirdNote: string = "var(--third-note)";
+    public static readonly thirdNote: string = "var(--third-note, #558844)";
     public static readonly whitePianoKey: string = "var(--white-piano-key)";
     public static readonly blackPianoKey: string = "var(--black-piano-key)";
     public static readonly useColorFormula: string = "var(--use-color-formula)";

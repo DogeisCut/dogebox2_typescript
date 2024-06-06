@@ -46,7 +46,7 @@ export class SpectrumEditor {
 				this._fifths.appendChild(SVG.rect({fill: ColorConfig.fifthNote, x: (i+1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight}));
 		}
 		//for (let i: number = ????; i <= Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) { //I cant quite figure this out
-		//		this._thirds.appendChild(SVG.rect({fill: ColorConfig.thirdNote ? ColorConfig.thirdNote : "#558844", x: (i+1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight}));
+		//		this._thirds.appendChild(SVG.rect({fill: ColorConfig.thirdNote, x: (i+1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight}));
 		//}
 			
 		this.container.addEventListener("mousedown", this._whenMousePressed);
