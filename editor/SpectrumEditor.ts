@@ -14,12 +14,14 @@ export class SpectrumEditor {
 		private readonly _fill: SVGPathElement = SVG.path({fill: ColorConfig.uiWidgetBackground, "pointer-events": "none"});
 		private readonly _octaves: SVGSVGElement = SVG.svg({"pointer-events": "none"});
 		private readonly _fifths: SVGSVGElement = SVG.svg({"pointer-events": "none"});
+		private readonly _thirds: SVGSVGElement = SVG.svg({"pointer-events": "none"});
 		private readonly _curve: SVGPathElement = SVG.path({fill: "none", stroke: "currentColor", "stroke-width": 2, "pointer-events": "none"});
 		private readonly _arrow: SVGPathElement = SVG.path({fill: "currentColor", "pointer-events": "none"});
 		private readonly _svg: SVGSVGElement = SVG.svg({style: `background-color: ${ColorConfig.editorBackground}; touch-action: none; cursor: crosshair;`, width: "100%", height: "100%", viewBox: "0 0 "+this._editorWidth+" "+this._editorHeight, preserveAspectRatio: "none"},
 		this._fill,
 		this._octaves,
 		this._fifths,
+		this._thirds,
 		this._curve,
 		this._arrow,
 	);
@@ -34,6 +36,7 @@ export class SpectrumEditor {
 	private _change: ChangeSpectrum | null = null;
 	private _renderedPath: String = "";
 	private _renderedFifths: boolean = true;
+	private _renderedThirds: boolean = true;
 		
 	constructor(private _doc: SongDocument, private _spectrumIndex: number | null) {
 		for (let i: number = 0; i < Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
@@ -42,6 +45,9 @@ export class SpectrumEditor {
 		for (let i: number = 4; i <= Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
 				this._fifths.appendChild(SVG.rect({fill: ColorConfig.fifthNote, x: (i+1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight}));
 		}
+		//for (let i: number = ????; i <= Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) { //I cant quite figure this out
+		//		this._thirds.appendChild(SVG.rect({fill: ColorConfig.thirdNote ? ColorConfig.thirdNote : "#558844", x: (i+1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight}));
+		//}
 			
 		this.container.addEventListener("mousedown", this._whenMousePressed);
 		document.addEventListener("mousemove", this._whenMouseMoved);
@@ -184,6 +190,10 @@ export class SpectrumEditor {
 		if (this._renderedFifths != this._doc.prefs.showFifth) {
 			this._renderedFifths = this._doc.prefs.showFifth;
 			this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
+		}
+		if (this._renderedThirds != this._doc.prefs.showThird) {
+			this._renderedThirds = this._doc.prefs.showThird;
+			this._thirds.style.display = this._doc.prefs.showThird ? "" : "none";
 		}
 	}
 }

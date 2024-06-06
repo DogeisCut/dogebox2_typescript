@@ -3132,6 +3132,7 @@ export class ColorConfig {
 				--pitch-background: #222222;
 				--tonic: #ab382c;
 				--fifth-note: #2a76a8;
+				--third-note: #70AB2C;
 				--white-piano-key: #ffffff;
 				--black-piano-key: #222222;
 				--white-piano-key-text: #000000;
@@ -3253,6 +3254,7 @@ export class ColorConfig {
     public static readonly pitchBackground: string = "var(--pitch-background)";
     public static readonly tonic: string = "var(--tonic)";
     public static readonly fifthNote: string = "var(--fifth-note)";
+    public static readonly thirdNote: string = "var(--third-note)";
     public static readonly whitePianoKey: string = "var(--white-piano-key)";
     public static readonly blackPianoKey: string = "var(--black-piano-key)";
     public static readonly whitePianoKeyText: string = "var(--white-piano-key-text)";
