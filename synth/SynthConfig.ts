@@ -499,7 +499,7 @@ export class Config {
     ]);
     public static readonly operatorCarrierInterval: ReadonlyArray<number> = [0.0, 0.04, -0.073, 0.091];
     public static readonly operatorAmplitudeMax: number = 15;
-    public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([
+    public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([ //this will still be useful for backwards compat
         { name: "1×", mult: 1.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "~1×", mult: 1.0, hzOffset: 1.5, amplitudeSign: -1.0 },
         { name: "2×", mult: 2.0, hzOffset: 0.0, amplitudeSign: 1.0 },
@@ -516,6 +516,7 @@ export class Config {
         { name: "16×", mult: 16.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "20×", mult: 20.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         
+        //these are broken why did i add these....
         { name: "-1×", mult: -1.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "-~1×", mult: -1.0, hzOffset: 1.5, amplitudeSign: -1.0 },
         { name: "-2×", mult: -2.0, hzOffset: 0.0, amplitudeSign: 1.0 },
