@@ -43,7 +43,7 @@ import { RecordingSetupPrompt } from "./RecordingSetupPrompt";
 import { SpectrumEditor } from "./SpectrumEditor";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeDiscreteEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeInvertWave, ChangeLowerLimit, ChangeUpperLimit, ChangeOperatorHzOffset, ChangeOperatorInvert } from "./changes";
+import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeDiscreteEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeInvertWave, ChangeLowerLimit, ChangeUpperLimit, ChangeOperatorHzOffset, ChangeOperatorInvert, ChangeSongReverb, ChangeSongDetune } from "./changes";
 
 import { TrackEditor } from "./TrackEditor";
 
@@ -428,6 +428,14 @@ export class SongEditor {
     private readonly _keySelect: HTMLSelectElement = buildOptions(select(), Config.keys.map(key => key.name).reverse());
     private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "30", max: "320", value: "160", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeTempo(this._doc, oldValue, newValue), false);
     private readonly _tempoStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+    
+    private readonly _songDetuneSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: Config.songDetuneMin, max: Config.songDetuneMax, value: Config.songDetuneMax/2, step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeSongDetune(this._doc, oldValue, newValue), false);
+    private readonly _songDetuneStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+    
+    private readonly _songReverbSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "0", max: Config.reverbRange, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeSongReverb(this._doc, oldValue, newValue), false);
+    private readonly _songReverbStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+    
+    
     private readonly _chorusSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeChorus(this._doc, oldValue, newValue), false);
     private readonly _chorusRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chorus") }, "Chorus:"), this._chorusSlider.container);
     private readonly _reverbSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeReverb(this._doc, oldValue, newValue), false);
@@ -825,6 +833,20 @@ export class SongEditor {
                 span({ style: "display: flex;" },
                     this._tempoSlider.container,
                     this._tempoStepper,
+                ),
+            ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("songDetune") }, "Detune: "),
+                span({ style: "display: flex;" },
+                    this._songDetuneSlider.container,
+                    this._songDetuneStepper,
+                ),
+            ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("songReverb") }, "Reverb: "),
+                span({ style: "display: flex;" },
+                    this._songReverbSlider.container,
+                    this._songReverbStepper,
                 ),
             ),
             div({ class: "selectRow" },
@@ -1421,6 +1443,10 @@ export class SongEditor {
                 return this._panDelaySlider;
             case Config.modulators.dictionary["tempo"].index:
                 return this._tempoSlider;
+            case Config.modulators.dictionary["song detune"].index:
+                return this._songDetuneSlider;
+            case Config.modulators.dictionary["song reverb"].index:
+                return this._songReverbSlider;
             case Config.modulators.dictionary["song volume"].index:
                 return this._volumeSlider;
             case Config.modulators.dictionary["eq filt cut"].index:
