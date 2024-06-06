@@ -170,7 +170,7 @@ export class RecordingSetupPrompt implements Prompt {
 						} else if (scalePitch == 7 && this._doc.prefs.showFifth) {
 							key.style.background = ColorConfig.fifthNote;
 						} else if (scalePitch == 4 && this._doc.prefs.showThird) {
-							key.style.background = ColorConfig.thirdNote ? ColorConfig.thirdNote : "#558844";
+							key.style.background = ColorConfig.thirdNote;
 						} else {
 							key.style.background = ColorConfig.pitchBackground;
 						}

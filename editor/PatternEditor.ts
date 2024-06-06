@@ -2398,7 +2398,7 @@ export class PatternEditor {
 
         if (this._renderedThirds != this._doc.prefs.showThird) {
             this._renderedThirds = this._doc.prefs.showThird;
-            this._backgroundPitchRows[4].setAttribute("fill", this._doc.prefs.showThird ? (ColorConfig.thirdNote ? ColorConfig.thirdNote : "#558844") : ColorConfig.pitchBackground);
+            this._backgroundPitchRows[4].setAttribute("fill", this._doc.prefs.showThird ? ColorConfig.thirdNote : ColorConfig.pitchBackground);
         }
 
         for (let j: number = 0; j < Config.pitchesPerOctave; j++) {
