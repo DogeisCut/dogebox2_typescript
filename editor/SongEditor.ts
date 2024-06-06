@@ -410,6 +410,7 @@ export class SongEditor {
         option({ value: "enableNotePreview" }, "Hear Added Notes"),
         option({ value: "showLetters" }, "Show Piano Keys"),
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
+        option({ value: "showThird" }, 'Highlight "Third" Note'),
         option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"),
         option({ value: "setDefaultScale" }, "Set Current Scale as Default"),
         option({ value: "showChannels" }, "Show All Channels"),
@@ -515,7 +516,8 @@ export class SongEditor {
     private readonly _pitchShiftSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangePitchShift(this._doc, oldValue, newValue), true);
     private readonly _pitchShiftTonicMarkers: HTMLDivElement[] = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
     private readonly _pitchShiftFifthMarkers: HTMLDivElement[] = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 7 / 24) + "%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 19 / 24) + "%" } })];
-    private readonly _pitchShiftMarkerContainer: HTMLDivElement = div({ style: "display: flex; position: relative;" }, this._pitchShiftSlider.container, div({ class: "pitchShiftMarkerContainer" }, this._pitchShiftTonicMarkers, this._pitchShiftFifthMarkers));
+    private readonly _pitchShiftThirdMarkers: HTMLDivElement[] = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.thirdNote ? ColorConfig.thirdNote : "#558844", left: (100 * 4 / 24) + "%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.thirdNote ? ColorConfig.thirdNote : "#558844", left: (100 * 18 / 24) + "%" } })];//this is wrong plz fix
+    private readonly _pitchShiftMarkerContainer: HTMLDivElement = div({ style: "display: flex; position: relative;" }, this._pitchShiftSlider.container, div({ class: "pitchShiftMarkerContainer" }, this._pitchShiftTonicMarkers, this._pitchShiftFifthMarkers, this._pitchShiftThirdMarkers));
     private readonly _pitchShiftRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "Pitch Shift:"), this._pitchShiftMarkerContainer);
     private readonly _detuneSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this._doc, (oldValue: number, newValue: number) => new ChangeDetune(this._doc, oldValue, newValue), true);
     private readonly _detuneSliderInputBox: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
@@ -1624,6 +1626,7 @@ export class SongEditor {
             (prefs.enableNotePreview ? "✓ " : "　") + "Hear Added Notes",
             (prefs.showLetters ? "✓ " : "　") + "Show Piano Keys",
             (prefs.showFifth ? "✓ " : "　") + 'Highlight "Fifth" Note',
+            (prefs.showThird ? "✓ " : "　") + 'Highlight "Third" Note',
             (prefs.notesOutsideScale ? "✓ " : "　") + "Place Notes Out of Scale",
             (prefs.defaultScale == this._doc.song.scale ? "✓ " : "　") + "Set Current Scale as Default",
             (prefs.showChannels ? "✓ " : "　") + "Show All Channels",
@@ -1880,6 +1883,9 @@ export class SongEditor {
                 this._pitchShiftSlider.input.title = (instrument.pitchShift - Config.pitchShiftCenter) + " semitone(s)";
                 for (const marker of this._pitchShiftFifthMarkers) {
                     marker.style.display = prefs.showFifth ? "" : "none";
+                }
+                for (const marker of this._pitchShiftThirdMarkers) {
+                    marker.style.display = prefs.showThird ? "" : "none";
                 }
             } else {
                 this._pitchShiftRow.style.display = "none";
@@ -3268,6 +3274,8 @@ export class SongEditor {
             case 74: // j
                 if (canPlayNotes) break;
                 // Ctrl Alt Shift J: Jummbify - set all prefs to my preferred ones lol
+                // WHY DOES THIS EXIST
+                // more of a reson to add settings import/export...
                 if (event.shiftKey && event.ctrlKey && event.altKey) {
                     this._doc.prefs.autoPlay = false;
                     this._doc.prefs.autoFollow = false;
@@ -4222,6 +4230,9 @@ export class SongEditor {
                 break;
             case "showFifth":
                 this._doc.prefs.showFifth = !this._doc.prefs.showFifth;
+                break;
+            case "showThird":
+                this._doc.prefs.showThird = !this._doc.prefs.showThird;
                 break;
             case "notesOutsideScale":
                 this._doc.prefs.notesOutsideScale = !this._doc.prefs.notesOutsideScale;
