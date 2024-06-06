@@ -171,8 +171,9 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor .operatorRow {
 	margin: 2px 0;
+	height: 2em;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	align-items: center;
 }
 

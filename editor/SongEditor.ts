@@ -983,9 +983,12 @@ export class SongEditor {
             const waveformPulsewidthSlider: Slider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "Pulse Width" }), this._doc, (oldValue: number, newValue: number) => new ChangeOperatorPulseWidth(this._doc, operatorIndex, oldValue, newValue), true);
             const waveformDropdownRow: HTMLElement = div({ class: "selectRow" }, waveformDropdownHint, waveformPulsewidthSlider.container,
                 div({ class: "selectContainer", style: "width: 6em; margin-left: .3em;" }, waveformSelect));
-            const waveformDropdownHzOffsetRow: HTMLElement = div({ class: "selectRow" }, hzOffsetInputHint, hzOffsetInput);  
-            const waveformDropdownInvertRow: HTMLElement = div({ class: "selectRow" }, invertInputHint, invertInput);  
-            const waveformDropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, waveformDropdownRow, waveformDropdownHzOffsetRow, waveformDropdownInvertRow);
+            const hzOffsetDropdownRow: HTMLElement = div({ class: "selectRow" }, hzOffsetInputHint, hzOffsetInput);  
+            const invertDropdownRow: HTMLElement = div({ class: "selectRow" }, invertInputHint, invertInput);  
+            const waveformDropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, waveformDropdownRow);
+            const invertDropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, hzOffsetDropdownRow);
+            const hzOffsetDropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, invertDropdownRow);
+            const fullDropdownGroup: HTMLDivElement = div({ ckass: "menu-area"}, waveformDropdownGroup, invertDropdownGroup, hzOffsetDropdownGroup)
             const row: HTMLDivElement = div({ class: "selectRow" },
                 operatorNumber,
                 waveformDropdown,
@@ -1005,8 +1008,8 @@ export class SongEditor {
             this._operatorWaveformSelects[i] = waveformSelect;
             this._operatorWaveformPulsewidthSliders[i] = waveformPulsewidthSlider;
             this._operatorDropdownRows[i] = waveformDropdownRow;
-            this._phaseModGroup.appendChild(waveformDropdownGroup);
-            this._operatorDropdownGroups[i] = waveformDropdownGroup;
+            this._phaseModGroup.appendChild(fullDropdownGroup);
+            this._operatorDropdownGroups[i] = fullDropdownGroup;
             this._openOperatorDropdowns[i] = false;
 
             waveformSelect.addEventListener("change", () => {
@@ -3098,6 +3101,18 @@ export class SongEditor {
 
         // Defer to actively editing any of the existing FM frequencies
         for (const numbox of this._operatorFrequencyInputs) {
+            if (document.activeElement == numbox) {
+                // Enter/esc returns focus to form
+                if (event.keyCode == 13 || event.keyCode == 27) {
+                    this.mainLayer.focus();
+                }
+    
+                return;
+            }
+        }
+
+        // Do I really need to say this every time?
+        for (const numbox of this._operatorHzOffsetInputs) {
             if (document.activeElement == numbox) {
                 // Enter/esc returns focus to form
                 if (event.keyCode == 13 || event.keyCode == 27) {
