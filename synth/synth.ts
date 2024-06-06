@@ -672,7 +672,9 @@ export class Pattern {
 }
 
 export class Operator {
-    public frequency: number = 4;
+    public frequency: number = 0;
+    public hzOffset: number = 0;
+    public invert: boolean = false;
     public amplitude: number = 0;
     public waveform: number = 0;
     public pulseWidth: number = 0.5;
@@ -682,7 +684,9 @@ export class Operator {
     }
 
     public reset(index: number): void {
-        this.frequency = 4; //defualt to 1x
+        this.frequency = 0;
+        this.hzOffset = 0;
+        this.invert = false;
         this.amplitude = (index <= 1) ? Config.operatorAmplitudeMax : 0;
         this.waveform = 0;
         this.pulseWidth = 5;
@@ -690,6 +694,8 @@ export class Operator {
 
     public copy(other: Operator): void {
         this.frequency = other.frequency;
+        this.hzOffset = other.hzOffset;
+        this.invert = other.invert;
         this.amplitude = other.amplitude;
         this.waveform = other.waveform;
         this.pulseWidth = other.pulseWidth;
@@ -10869,7 +10875,7 @@ export class Synth {
                 const pitchEnd: number = trueBasePitch + (pitch + intervalEnd) * intervalScale + interval;
                 const baseFreqStart: number = Instrument.frequencyFromPitch(pitchStart);
                 const baseFreqEnd: number = Instrument.frequencyFromPitch(pitchEnd);
-                const hzOffset: number = 0.0//Config.operatorFrequencies[instrument.operators[i].frequency].hzOffset;
+                const hzOffset: number = instrument.operators[i].hzOffset;
                 const targetFreqStart: number = freqMult * baseFreqStart + hzOffset;
                 const targetFreqEnd: number = freqMult * baseFreqEnd + hzOffset;
 
@@ -10904,8 +10910,9 @@ export class Synth {
 
                 const amplitudeCurveStart: number = Synth.operatorAmplitudeCurve(amplitudeStart);
                 const amplitudeCurveEnd: number = Synth.operatorAmplitudeCurve(amplitudeEnd);
-                const amplitudeMultStart: number = amplitudeCurveStart * 1//Config.operatorFrequencies[instrument.operators[i].frequency].amplitudeSign;
-                const amplitudeMultEnd: number = amplitudeCurveEnd * 1//Config.operatorFrequencies[instrument.operators[i].frequency].amplitudeSign;
+                const ampliutudeSign: number = instrument.operators[i].invert ? -1 : 1
+                const amplitudeMultStart: number = amplitudeCurveStart * ampliutudeSign
+                const amplitudeMultEnd: number = amplitudeCurveEnd * ampliutudeSign
 
                 let expressionStart: number = amplitudeMultStart;
                 let expressionEnd: number = amplitudeMultEnd;
