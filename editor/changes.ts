@@ -712,6 +712,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     for (let i: number = 0; i < algorithm.carrierCount; i++) {
                         instrument.operators[i].frequency = selectCurvedDistribution(0, Config.operatorFrequencies.length - 1, 0, 3);
                         instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
+                        //TODO: HzOffset and Invert randomness
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 3 },
                             { item: "triangle", weight: 4 },
@@ -2343,6 +2344,34 @@ export class ChangeOperatorFrequency extends Change {
         const oldValue: number = instrument.operators[operatorIndex].frequency;
         if (oldValue != newValue) {
             instrument.operators[operatorIndex].frequency = newValue;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeOperatorHzOffset extends Change {
+    constructor(doc: SongDocument, operatorIndex: number, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue: number = instrument.operators[operatorIndex].hzOffset;
+        if (oldValue != newValue) {
+            instrument.operators[operatorIndex].hzOffset = newValue;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeOperatorInvert extends Change {
+    constructor(doc: SongDocument, operatorIndex: number, newValue: boolean) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue: boolean = instrument.operators[operatorIndex].invert;
+        if (oldValue != newValue) {
+            instrument.operators[operatorIndex].invert = newValue;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();

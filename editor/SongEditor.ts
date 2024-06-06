@@ -43,7 +43,7 @@ import { RecordingSetupPrompt } from "./RecordingSetupPrompt";
 import { SpectrumEditor } from "./SpectrumEditor";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeDiscreteEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeInvertWave, ChangeLowerLimit, ChangeUpperLimit } from "./changes";
+import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeDiscreteEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeInvertWave, ChangeLowerLimit, ChangeUpperLimit, ChangeOperatorHzOffset, ChangeOperatorInvert } from "./changes";
 
 import { TrackEditor } from "./TrackEditor";
 
@@ -882,7 +882,7 @@ export class SongEditor {
     private _deactivatedInstruments: boolean = false;
     private readonly _operatorRows: HTMLDivElement[] = [];
     private readonly _operatorAmplitudeSliders: Slider[] = [];
-    private readonly _operatorFrequencySelects: HTMLInputElement[] = [];
+    private readonly _operatorFrequencyInputs: HTMLInputElement[] = [];
     private readonly _operatorDropdowns: HTMLButtonElement[] = [];
     private readonly _operatorWaveformSelects: HTMLSelectElement[] = [];
     private readonly _operatorWaveformHints: HTMLSpanElement[] = [];
@@ -949,13 +949,13 @@ export class SongEditor {
         for (let i: number = 0; i < Config.operatorCount; i++) {
             const operatorIndex: number = i;
             const operatorNumber: HTMLDivElement = div({ style: "margin-right: 0px; color: " + ColorConfig.secondaryText + ";" }, i + 1 + "");
-            const frequencySelect: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "frequencySelect", type: "number", step: "1", min: "-1000", max: "1000", value: "1" });
+            const frequencyInput: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "frequencyInput", type: "number", step: "0.25", min: "0.25", max: "100000", value: "1" });
             const amplitudeSlider: Slider = new Slider(input({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Volume" }), this._doc, (oldValue: number, newValue: number) => new ChangeOperatorAmplitude(this._doc, operatorIndex, oldValue, newValue), false);
             const waveformSelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Waveform" }), Config.operatorWaves.map(wave => wave.name));
             const waveformDropdown: HTMLButtonElement = button({ style: "margin-left:0em; margin-right: 2px; height:1.5em; width: 8px; max-width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.FM, i) }, "▼");
             const waveformDropdownHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("operatorWaveform") }, "Wave:");
             const hzOffsetInputHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("hzOffset") }, "Hz Offset:");
-            const hzOffsetInput: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "hzOffsetInput", type: "number", step: "0.1", min: "-10", max: "10", value: "0" });
+            const hzOffsetInput: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; ", id: "hzOffsetInput", type: "number", step: "0.1", min: "-200", max: "200", value: "0" });
             const invertInputHint: HTMLSpanElement = span({ class: "tip", style: "margin-left: 10px;", onclick: () => this._openPrompt("fmInvert") }, "Invert:");
             const invertInput: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
             const waveformPulsewidthSlider: Slider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "Pulse Width" }), this._doc, (oldValue: number, newValue: number) => new ChangeOperatorPulseWidth(this._doc, operatorIndex, oldValue, newValue), true);
@@ -967,13 +967,13 @@ export class SongEditor {
             const row: HTMLDivElement = div({ class: "selectRow" },
                 operatorNumber,
                 waveformDropdown,
-                div({ class: "selectContainer", style: "width: 3em; margin-right: .3em;" }, frequencySelect),
+                div({ class: "selectContainer", style: "width: 3em; margin-right: .3em;" }, frequencyInput),
                 amplitudeSlider.container,
             );
             this._phaseModGroup.appendChild(row);
             this._operatorRows[i] = row;
             this._operatorAmplitudeSliders[i] = amplitudeSlider;
-            this._operatorFrequencySelects[i] = frequencySelect;
+            this._operatorFrequencyInputs[i] = frequencyInput;
             this._operatorDropdowns[i] = waveformDropdown;
             this._operatorWaveformHints[i] = waveformDropdownHint;
             this._operatorHzOffsetInputs[i] = hzOffsetInput;
@@ -991,8 +991,20 @@ export class SongEditor {
                 this._doc.record(new ChangeOperatorWaveform(this._doc, operatorIndex, waveformSelect.selectedIndex));
             });
 
-            frequencySelect.addEventListener("change", () => {
-                this._doc.record(new ChangeOperatorFrequency(this._doc, operatorIndex, parseFloat(frequencySelect.value)));
+            frequencyInput.addEventListener("input", () => {
+                let value = parseFloat(frequencyInput.value)
+                if (value <= 0) {
+                    value = 0.25
+                }
+                this._doc.record(new ChangeOperatorFrequency(this._doc, operatorIndex, value));
+            });
+
+            hzOffsetInput.addEventListener("change", () => {
+                this._doc.record(new ChangeOperatorHzOffset(this._doc, operatorIndex, Math.min(Math.max(parseFloat(hzOffsetInput.value), -200), 200)));
+            });
+
+            invertInput.addEventListener("change", () => {
+                this._doc.record(new ChangeOperatorInvert(this._doc, operatorIndex, invertInput.checked));
             });
         }
 
@@ -1183,8 +1195,7 @@ export class SongEditor {
 
         this._upperNoteLimitInputBox.addEventListener("input", () => { this._doc.record(new ChangeUpperLimit(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].upperNoteLimit, (Math.min(Config.maxPitch, Math.max(0.0, Math.round(+this._upperNoteLimitInputBox.value)))))) });
         this._lowerNoteLimitInputBox.addEventListener("input", () => { this._doc.record(new ChangeLowerLimit(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].lowerNoteLimit, (Math.min(Config.maxPitch, Math.max(0.0, Math.round(+this._lowerNoteLimitInputBox.value)))))) });
-
-
+        
         this._promptContainer.addEventListener("click", (event) => {
             if (event.target == this._promptContainer) {
                 this._doc.undo();
@@ -1828,14 +1839,16 @@ export class SongEditor {
                 for (let i: number = 0; i < Config.operatorCount; i++) {
                     const isCarrier: boolean = (i < Config.algorithms[instrument.algorithm].carrierCount);
                     this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
-                    this._operatorFrequencySelects[i].value = instrument.operators[i].frequency.toString();
+                    this._operatorFrequencyInputs[i].value = instrument.operators[i].frequency.toString();
+                    this._operatorHzOffsetInputs[i].value = instrument.operators[i].hzOffset.toString();
+                    this._operatorInvertCheckboxes[i].checked = instrument.operators[i].invert;
                     this._operatorAmplitudeSliders[i].updateValue(instrument.operators[i].amplitude);
                     setSelectedValue(this._operatorWaveformSelects[i], instrument.operators[i].waveform);
                     this._operatorWaveformPulsewidthSliders[i].updateValue(instrument.operators[i].pulseWidth);
                     this._operatorWaveformPulsewidthSliders[i].input.title = "" + Config.pwmOperatorWaves[instrument.operators[i].pulseWidth].name;
                     this._operatorDropdownGroups[i].style.color = isCarrier ? ColorConfig.primaryText : "";
                     const operatorName: string = (isCarrier ? "Voice " : "Modulator ") + (i + 1);
-                    this._operatorFrequencySelects[i].title = operatorName + " Frequency";
+                    this._operatorFrequencyInputs[i].title = operatorName + " Frequency";
                     this._operatorAmplitudeSliders[i].input.title = operatorName + (isCarrier ? " Volume" : " Amplitude");
                     this._operatorDropdownGroups[i].style.display = (this._openOperatorDropdowns[i] ? "" : "none");
                     if (instrument.operators[i].waveform == 3) {
@@ -3047,7 +3060,7 @@ export class SongEditor {
             return;
         }
 
-        // Defer to actively editing upper note limit
+        // Defer to actively editing upper and lower note limit
         if (document.activeElement == this._upperNoteLimitInputBox || document.activeElement == this._lowerNoteLimitInputBox) {
             // Enter/esc returns focus to form
             if (event.keyCode == 13 || event.keyCode == 27) {
@@ -3057,15 +3070,18 @@ export class SongEditor {
             return;
         }
 
-        // Defer to actively editing upper note limit
-        if (document.activeElement == this._upperNoteLimitInputBox || document.activeElement == this._lowerNoteLimitInputBox) {
-            // Enter/esc returns focus to form
-            if (event.keyCode == 13 || event.keyCode == 27) {
-                this.mainLayer.focus();
+        // Defer to actively editing any of the existing FM frequencies
+        for (const numbox of this._operatorFrequencyInputs) {
+            if (document.activeElement == numbox) {
+                // Enter/esc returns focus to form
+                if (event.keyCode == 13 || event.keyCode == 27) {
+                    this.mainLayer.focus();
+                }
+    
+                return;
             }
-
-            return;
         }
+
 
         if (this._doc.synth.recording) {
             // The only valid keyboard interactions when recording are playing notes or pressing space OR P to stop.
