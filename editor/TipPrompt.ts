@@ -492,6 +492,18 @@ export class TipPrompt implements Prompt {
 					p("Previously, frequency options containing the tidle (e.g. ~1x, ~2x) would have this enabled.")
 				);
 			} break;
+			case "songDetune": {
+				message = div(
+					h2("Song Detune"),
+					p("This setting controls the overall detune of the entire song. See instrument detune for more information."),
+				);
+			} break;
+			case "songReverb": {
+				message = div(
+					h2("Song Reverb"),
+					p("This setting controls the overall reverb of the entire song, this is multiplicative and will not affect insturments with no reverb. See instrument reverb for more information."),
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#

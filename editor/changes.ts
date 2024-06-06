@@ -4287,6 +4287,16 @@ export class ChangeSongReverb extends Change {
     }
 }
 
+export class ChangeSongDetune extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        //doc.song.detune = newValue;
+        doc.synth.unsetMod(Config.modulators.dictionary["song detune"].index);
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeNoteAdded extends UndoableChange {
     private _doc: SongDocument;
     private _pattern: Pattern;
