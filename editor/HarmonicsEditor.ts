@@ -44,7 +44,7 @@ export class HarmonicsEditor {
 		for (let i: number = 3; i <= Config.harmonicsControlPoints; i = i * 2) {
 				this._fifths.appendChild(SVG.rect({fill: ColorConfig.fifthNote, x: (i-0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight}));
 		}
-		for (let i: number = 5; i <= Config.harmonicsControlPoints; i = i * 2) { //I cant quite figure this out
+		for (let i: number = 5; i <= Config.harmonicsControlPoints; i = i * 2) {
 				this._fifths.appendChild(SVG.rect({fill: ColorConfig.thirdNote, x: (i-0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight}));
 		}
 		for (let i: number = 0; i < 4; i++) {
