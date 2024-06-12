@@ -2057,35 +2057,18 @@ export class Instrument {
             const operatorArray: Object[] = [];
             for (const operator of this.operators) {
                 operatorArray.push({
-                    "frequency": Config.operatorFrequencies[operator.frequency].name,
+                    "frequency": operator.frequency,
+                    "hzOffset": operator.hzOffset,
+                    "invert": operator.invert,
                     "amplitude": operator.amplitude,
                     "waveform": Config.operatorWaves[operator.waveform].name,
                     "pulseWidth": operator.pulseWidth,
                 });
             }
-            if(this.type == InstrumentType.fm){
-                instrumentObject["algorithm"] = Config.algorithms[this.algorithm].name;
-                instrumentObject["feedbackType"] = Config.feedbacks[this.feedbackType].name;
-                instrumentObject["feedbackAmplitude"] = this.feedbackAmplitude;
-                instrumentObject["operators"] = operatorArray;
-            } else {
-                instrumentObject["algorithm"] = Config.algorithms6Op[this.algorithm6Op].name;
-                instrumentObject["feedbackType"] = Config.feedbacks6Op[this.feedbackType6Op].name;
-                instrumentObject["feedbackAmplitude"] = this.feedbackAmplitude;
-                if(this.algorithm6Op == 0){
-                    const customAlgorithm: any = {};
-                    customAlgorithm["mods"] = this.customAlgorithm.modulatedBy;
-                    customAlgorithm["carrierCount"] = this.customAlgorithm.carrierCount;
-                    instrumentObject["customAlgorithm"] = customAlgorithm;
-                }
-                if(this.feedbackType6Op == 0){
-                    const customFeedback: any = {};
-                    customFeedback["mods"] = this.customFeedbackType.indices;
-                    instrumentObject["customFeedback"] = customFeedback;
-                }
-
-                instrumentObject["operators"] = operatorArray;
-            }
+            instrumentObject["algorithm"] = Config.algorithms[this.algorithm].name;
+            instrumentObject["feedbackType"] = Config.feedbacks[this.feedbackType].name;
+            instrumentObject["feedbackAmplitude"] = this.feedbackAmplitude;
+            instrumentObject["newOperators"] = operatorArray;
         } else if (this.type == InstrumentType.customChipWave) {
             instrumentObject["wave"] = Config.chipWaves[this.chipWave].name;
             instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
@@ -2585,41 +2568,91 @@ export class Instrument {
             for (let j: number = 0; j < Config.operatorCount + (this.type == InstrumentType.fm6op?2:0); j++) {
                 const operator: Operator = this.operators[j];
                 let operatorObject: any = undefined;
-                if (instrumentObject["operators"] != undefined) operatorObject = instrumentObject["operators"][j];
-                if (operatorObject == undefined) operatorObject = {};
+                if (instrumentObject["operators"] != undefined) { // Old operators, need to be converted to new format.
+                    operatorObject = instrumentObject["operators"][j];
+                    if (operatorObject == undefined) operatorObject = {};
 
-                operator.frequency = Config.operatorFrequencies.findIndex(freq => freq.name == operatorObject["frequency"]);
-                if (operator.frequency == -1) operator.frequency = 0;
-                if (operatorObject["amplitude"] != undefined) {
-                    operator.amplitude = clamp(0, Config.operatorAmplitudeMax + 1, operatorObject["amplitude"] | 0);
-                } else {
-                    operator.amplitude = 0;
-                }
-                if (operatorObject["waveform"] != undefined) {
-                    // If the json is from GB, we override the last two waves to be sine to account for a bug
-                    if (format == "goldbox" && j > 3) {
-                       operator.waveform = 0;
-                       continue;
+                    let operatorIndex: number = Config.operatorFrequencies.findIndex(freq => freq.name == operatorObject["frequency"]);
+                    if (operatorIndex == -1) {
+                        operator.frequency = 1;
+                        operator.hzOffset = 0;
+                        operator.invert = false;
+                    } else {
+                        operator.frequency = Config.operatorFrequencies[operatorIndex].mult;
+                        operator.hzOffset = Config.operatorFrequencies[operatorIndex].hzOffset;
+                        operator.invert = Config.operatorFrequencies[operatorIndex].amplitudeSign == 1.0 ? false : true;
                     }
+                    if (operatorObject["amplitude"] != undefined) {
+                        operator.amplitude = clamp(0, Config.operatorAmplitudeMax + 1, operatorObject["amplitude"] | 0);
+                    } else {
+                        operator.amplitude = 0;
+                    }
+                    if (operatorObject["waveform"] != undefined) {
+                        operator.waveform = Config.operatorWaves.findIndex(wave => wave.name == operatorObject["waveform"]);
+                        if (operator.waveform == -1) {
+                            // GoldBox compatibility
+                            if (operatorObject["waveform"] == "square") {
+                                operator.waveform = Config.operatorWaves.dictionary["pulse width"].index;
+                                operator.pulseWidth = 5;
+                            } else {
+                                operator.waveform = 0;
+                            }
 
-                    operator.waveform = Config.operatorWaves.findIndex(wave => wave.name == operatorObject["waveform"]);
-                    if (operator.waveform == -1) {
-                        // GoldBox compatibility
-                        if (operatorObject["waveform"] == "square") {
-                            operator.waveform = Config.operatorWaves.dictionary["pulse width"].index;
-                            operator.pulseWidth = 5;
-                        } else {
-                            operator.waveform = 0;
                         }
-
+                    } else {
+                        operator.waveform = 0;
                     }
-                } else {
-                    operator.waveform = 0;
-                }
-                if (operatorObject["pulseWidth"] != undefined) {
-                    operator.pulseWidth = operatorObject["pulseWidth"] | 0;
-                } else {
-                    operator.pulseWidth = 5;
+                    if (operatorObject["pulseWidth"] != undefined) {
+                        operator.pulseWidth = operatorObject["pulseWidth"] | 0;
+                    } else {
+                        operator.pulseWidth = 5;
+                    }
+                } if (instrumentObject["newOperators"] != undefined) { // New operators
+                    operatorObject = instrumentObject["operators"][j];
+                    if (operatorObject == undefined) operatorObject = {};
+
+                    if (operatorObject["frequency"] != undefined) {
+                        operator.frequency = operatorObject["frequency"];
+                    } else {
+                        operator.frequency = 1;
+                    }
+                    if (operatorObject["hzOffset"] != undefined) {
+                        operator.hzOffset = operatorObject["hzOffset"];
+                    } else {
+                        operator.hzOffset = 0;
+                    }
+                    if (operatorObject["invert"] != undefined) {
+                        operator.invert = operatorObject["invert"];
+                    } else {
+                        operator.invert = false;
+                    }
+                    if (operatorObject["amplitude"] != undefined) {
+                        operator.amplitude = clamp(0, Config.operatorAmplitudeMax + 1, operatorObject["amplitude"] | 0);
+                    } else {
+                        operator.amplitude = 0;
+                    }
+                    if (operatorObject["waveform"] != undefined) {
+                        operator.waveform = Config.operatorWaves.findIndex(wave => wave.name == operatorObject["waveform"]);
+                        if (operator.waveform == -1) {
+                            // GoldBox compatibility
+                            if (operatorObject["waveform"] == "square") {
+                                operator.waveform = Config.operatorWaves.dictionary["pulse width"].index;
+                                operator.pulseWidth = 5;
+                            } else {
+                                operator.waveform = 0;
+                            }
+
+                        }
+                    } else {
+                        operator.waveform = 0;
+                    }
+                    operator.hzOffset = Config.operatorFrequencies[Config.operatorFrequencies.findIndex(freq => freq.name == operatorObject["frequency"])].hzOffset;
+                    operator.invert = Config.operatorFrequencies[Config.operatorFrequencies.findIndex(freq => freq.name == operatorObject["frequency"])].amplitudeSign == 1.0 ? true : false;
+                    if (operatorObject["pulseWidth"] != undefined) {
+                        operator.pulseWidth = operatorObject["pulseWidth"] | 0;
+                    } else {
+                        operator.pulseWidth = 5;
+                    }
                 }
             }
         }
