@@ -161,8 +161,8 @@ const enum SongTagCode {
 	feedbackEnvelope    = CharCode.V, // added in BeepBox URL version 6, DEPRECATED
 	pulseWidth          = CharCode.W, // added in BeepBox URL version 7
 	aliases             = CharCode.X, // added in JummBox URL version 4 for aliases, DEPRECATED
-//	                    = CharCode.Y,
-//	                    = CharCode.Z,
+	operatorHzOffsets   = CharCode.Y, // added in Dogebox URL version 3 for custom FM frequencies.
+    operatorInverts     = CharCode.Z, // added in Dogebox URL version 3 for custom FM frequencies.
 //	                    = CharCode.NUM_0,
 //	                    = CharCode.NUM_1,
 //	                    = CharCode.NUM_2,
@@ -2443,7 +2443,7 @@ export class Song {
     private static readonly _oldestJummBoxVersion: number = 1;
     private static readonly _latestJummBoxVersion: number = 6;
     private static readonly _oldestDogebox2Version: number = 1;
-    private static readonly _latestDogebox2Version: number = 2;
+    private static readonly _latestDogebox2Version: number = 3;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox or in this case, Dogebox2.
     private static readonly _variant = 0x64; //"d" ~ Dogebox2
 
@@ -2893,6 +2893,14 @@ export class Song {
                     buffer.push(SongTagCode.operatorFrequencies);
                     for (let o: number = 0; o < Config.operatorCount; o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].frequency]);
+                    }
+                    buffer.push(SongTagCode.operatorHzOffsets);
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        buffer.push(base64IntToCharCode[instrument.operators[o].hzOffset]);
+                    }
+                    buffer.push(SongTagCode.operatorInverts);
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        buffer.push(base64IntToCharCode[+instrument.operators[o].invert]);
                     }
                     buffer.push(SongTagCode.operatorAmplitudes);
                     for (let o: number = 0; o < Config.operatorCount; o++) {
@@ -4311,8 +4319,27 @@ export class Song {
                 }
             } break;
             case SongTagCode.operatorFrequencies: {
+                if ((fromBeepBox) || (fromJummBox) || (beforeThree && fromDogebox)) {
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        let operatorIndex: number = Config.operatorFrequencies.findIndex(freq => freq.name == clamp(0, Config.operatorFrequencies.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]).toString());
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].frequency = Config.operatorFrequencies[operatorIndex].mult;
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].hzOffset = Config.operatorFrequencies[operatorIndex].hzOffset;
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].invert = Config.operatorFrequencies[operatorIndex].amplitudeSign == 1.0 ? false : true;
+                    }
+                } else {
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].frequency = clamp(0, 10000, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
+                }
+            } break;
+            case SongTagCode.operatorHzOffsets: {
                 for (let o: number = 0; o < Config.operatorCount; o++) {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].frequency = clamp(0, Config.operatorFrequencies.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].hzOffset = clamp(-200, 200, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                }
+            } break;
+            case SongTagCode.operatorInverts: {
+                for (let o: number = 0; o < Config.operatorCount; o++) {
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].invert = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false);
                 }
             } break;
             case SongTagCode.operatorAmplitudes: {
@@ -4463,7 +4490,7 @@ export class Song {
                     }
                 }
 
-                const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + bitStringLength);
+                const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + bitStringLength); 
                 charIndex += bitStringLength;
 
                 const bitsPerNoteSize: number = Song.getNeededBits(Config.noteSizeMax);
