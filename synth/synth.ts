@@ -2892,11 +2892,18 @@ export class Song {
 
                     buffer.push(SongTagCode.operatorFrequencies);
                     for (let o: number = 0; o < Config.operatorCount; o++) {
-                        buffer.push(base64IntToCharCode[instrument.operators[o].frequency]);
+                        //push the frequency
+                        let cleanFrequency = Math.round(instrument.operators[o].frequency * 4);
+                        buffer.push(base64IntToCharCode[cleanFrequency >> 6], base64IntToCharCode[cleanFrequency & 0x3f]);
                     }
                     buffer.push(SongTagCode.operatorHzOffsets);
                     for (let o: number = 0; o < Config.operatorCount; o++) {
-                        buffer.push(base64IntToCharCode[instrument.operators[o].hzOffset]);
+                        //push a sign bit
+                        buffer.push(base64IntToCharCode[Number((instrument.operators[o].hzOffset > 0))]);
+
+                        //push the absolute value of the hzOffset
+                        let cleanHzOffset = Math.round(Math.abs(instrument.operators[o].hzOffset) * 10);
+                        buffer.push(base64IntToCharCode[cleanHzOffset >> 6], base64IntToCharCode[cleanHzOffset & 0x3f]);
                     }
                     buffer.push(SongTagCode.operatorInverts);
                     for (let o: number = 0; o < Config.operatorCount; o++) {
@@ -4328,13 +4335,19 @@ export class Song {
                     }
                 } else {
                     for (let o: number = 0; o < Config.operatorCount; o++) {
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].frequency = clamp(0, 10000, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        const operatorFrequency: number = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].frequency = clamp(0, 100 + 1, operatorFrequency / 4);
                     }
                 }
             } break;
             case SongTagCode.operatorHzOffsets: {
                 for (let o: number = 0; o < Config.operatorCount; o++) {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].hzOffset = clamp(-200, 200, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    const operatorHzOffsetsSignBit = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    const operatorHzOffsets: number = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].hzOffset = clamp(-200 - 1, 200 + 1, operatorHzOffsets / 10);
+                    if (operatorHzOffsetsSignBit == 0) this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].hzOffset *= -1;
                 }
             } break;
             case SongTagCode.operatorInverts: {
