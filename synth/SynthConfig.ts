@@ -124,9 +124,9 @@ export const enum EnvelopeComputeIndex {
     supersawDynamism,
 	supersawSpread,
 	supersawShape,
-    length,
     operatorHzOffset0, operatorHzOffset1, operatorHzOffset2, operatorHzOffset3, 
     operatorInversion0, operatorInversion1, operatorInversion2, operatorInversion3, 
+    length,
 }
 
 export const enum CustomEnvelopeEndType {
@@ -1439,7 +1439,7 @@ export class Config {
 		{name: "supersawSpread",         computeIndex:       EnvelopeComputeIndex.supersawSpread,         displayName: "spread",           /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.supersawSpreadMax + 1,   */    maxCount: 1,    effect: null,                    compatibleInstruments: [InstrumentType.supersaw]},
 		{name: "supersawShape",          computeIndex:       EnvelopeComputeIndex.supersawShape,          displayName: "saw↔pulse",        /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.supersawShapeMax + 1,    */    maxCount: 1,    effect: null,                    compatibleInstruments: [InstrumentType.supersaw]},
         { name: "operatorHzOffset", computeIndex: EnvelopeComputeIndex.operatorHzOffset0, displayName: "fm# hz",         /*perNote:  true,*/ interleave: true, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: Config.operatorCount, effect: null, compatibleInstruments: [InstrumentType.fm] },
-        { name: "operatorFrequency", computeIndex: EnvelopeComputeIndex.operatorInversion0, displayName: "fm# invert",         /*perNote:  true,*/ interleave: true, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: Config.operatorCount, effect: null, compatibleInstruments: [InstrumentType.fm] },
+        { name: "operatorInversion", computeIndex: EnvelopeComputeIndex.operatorInversion0, displayName: "fm# invert",         /*perNote:  true,*/ interleave: true, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: Config.operatorCount, effect: null, compatibleInstruments: [InstrumentType.fm] },
 		// Ooh these too.
         /*
         {name: "distortion",             computeIndex: InstrumentAutomationIndex.distortion,             displayName: "distortion",       perNote: false, interleave: false, isFilter: false, range: Config.distortionRange,             maxCount: 1,    effect: EffectType.distortion,   compatibleInstruments: null},
