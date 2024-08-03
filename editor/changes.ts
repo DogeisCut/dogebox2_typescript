@@ -1532,7 +1532,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         }
                     }
                     for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
-                        instrument.operators[i].frequency = selectCurvedDistribution(4, Config.operatorFrequencies.length, 0, 3);
+                        instrument.operators[i].frequency = selectCurvedDistribution(4, Config.operatorFrequencies.length, 0, 3); //TODO: fix random for 1.4.1
                         instrument.operators[i].amplitude = (Math.pow(Math.random(), 2) * Config.operatorAmplitudeMax) | 0;
                         if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
                             instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorAmplitude"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
