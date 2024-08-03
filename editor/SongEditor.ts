@@ -3206,6 +3206,18 @@ export class SongEditor {
                             settingList.push("fm slider 3");
                             settingList.push("fm slider 4");
                             settingList.push("fm feedback");
+                            //settingList.push("fm hz frequency 1"); // FOR 1.4.1
+                            //settingList.push("fm hz frequency 2"); // FOR 1.4.1
+                            //settingList.push("fm hz frequency 3"); // FOR 1.4.1
+                            //settingList.push("fm hz frequency 4"); // FOR 1.4.1
+                            //settingList.push("fm hz offset 1"); // FOR 1.4.1
+                            //settingList.push("fm hz offset 2"); // FOR 1.4.1
+                            //settingList.push("fm hz offset 3"); // FOR 1.4.1
+                            //settingList.push("fm hz offset 4"); // FOR 1.4.1
+                            //settingList.push("fm invert 1"); // FOR 1.4.1
+                            //settingList.push("fm invert 2"); // FOR 1.4.1
+                            //settingList.push("fm invert 3"); // FOR 1.4.1
+                            //settingList.push("fm invert 4"); // FOR 1.4.1
                         }
                         if (tgtInstrumentTypes.includes(InstrumentType.fm6op)) {
                             settingList.push("fm slider 1");

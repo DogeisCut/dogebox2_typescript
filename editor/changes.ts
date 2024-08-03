@@ -960,7 +960,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     instrument.feedbackType = (Math.random() * Config.feedbacks.length) | 0;
                     const algorithm: Algorithm = Config.algorithms[instrument.algorithm];
                     for (let i: number = 0; i < algorithm.carrierCount; i++) {
-                        instrument.operators[i].frequency = selectCurvedDistribution(0, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].frequency = selectCurvedDistribution(1, Config.operatorFrequencies.length, 0, 3);
                         instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
                         //TODO: HzOffset and Invert randomness
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
@@ -989,7 +989,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         }
                     }
                     for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
-                        instrument.operators[i].frequency = selectCurvedDistribution(3, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].frequency = selectCurvedDistribution(4, Config.operatorFrequencies.length, 0, 3);
                         instrument.operators[i].amplitude = (Math.pow(Math.random(), 2) * Config.operatorAmplitudeMax) | 0;
                         if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
                             instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorAmplitude"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
@@ -1447,73 +1447,65 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         instrument.stringSustain = (Math.random() * Config.stringSustainRange) | 0;
                     }
 
-					const harmonicGenerators: Function[] = [
-						(): number[] => {
-							const harmonics: number[] = [];
-							for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
-								harmonics[i] = (Math.random() < 0.4) ? Math.random() : 0.0;
-							}
-							harmonics[(Math.random() * 8) | 0] = Math.pow(Math.random(), 0.25);
-							return harmonics;
-						},
-						(): number[] => {
-							let current: number = 1.0;
-							const harmonics: number[] = [current];
-							for (let i = 1; i < Config.harmonicsControlPoints; i++) {
-								current *= Math.pow(2, Math.random() - 0.55);
-								harmonics[i] = current;
-							}
-							return harmonics;
-						},
-						(): number[] => {
-							let current: number = 1.0;
-							const harmonics: number[] = [current];
-							for (let i = 1; i < Config.harmonicsControlPoints; i++) {
-								current *= Math.pow(2, Math.random() - 0.55);
-								harmonics[i] = current * Math.random();
-							}
-							return harmonics;
-						},
-					];
-					const generator = harmonicGenerators[(Math.random() * harmonicGenerators.length) | 0];
-					const harmonics: number[] = generator();
-					normalize(harmonics);
-					for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
-						instrument.harmonicsWave.harmonics[i] = Math.round(harmonics[i]);
-					}
-					instrument.harmonicsWave.markCustomWaveDirty();
-				} break;
-				case InstrumentType.spectrum: {
-					const spectrum: number[] = [];
-					for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
-						const isHarmonic: boolean = i == 0 || i == 7 || i == 11 || i == 14 || i == 16 || i == 18 || i == 21;
-						if (isHarmonic) {
-							spectrum[i] = Math.pow(Math.random(), 0.25);
-						} else {
-							spectrum[i] = Math.pow(Math.random(), 3) * 0.5;
-						}
-					}
-					normalize(spectrum);
-					for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
-						instrument.spectrumWave.spectrum[i] = Math.round(spectrum[i]);
-					}
-					instrument.spectrumWave.markCustomWaveDirty();
-				} break;
-				case InstrumentType.fm6op: 
-				case InstrumentType.fm: {
-					if(type == InstrumentType.fm){
-						instrument.algorithm = (Math.random() * Config.algorithms.length) | 0;
-						instrument.feedbackType = (Math.random() * Config.feedbacks.length) | 0;
-					}else{
-						instrument.algorithm6Op = (Math.random() * (Config.algorithms6Op.length-1)+1) | 0;
-						instrument.customAlgorithm.fromPreset(instrument.algorithm6Op);
-						instrument.feedbackType6Op = (Math.random() * (Config.feedbacks6Op.length-1)+1) | 0;
-						instrument.customFeedbackType.fromPreset(instrument.feedbackType6Op);
-					}
-					const algorithm: Algorithm = type == InstrumentType.fm? Config.algorithms[instrument.algorithm] : Config.algorithms6Op[instrument.algorithm6Op];
-					for (let i: number = 0; i < algorithm.carrierCount; i++) {
-						instrument.operators[i].frequency = selectCurvedDistribution(0, Config.operatorFrequencies.length - 1, 0, 3);
-						instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
+                    const harmonicGenerators: Function[] = [
+                        (): number[] => {
+                            const harmonics: number[] = [];
+                            for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
+                                harmonics[i] = (Math.random() < 0.4) ? Math.random() : 0.0;
+                            }
+                            harmonics[(Math.random() * 8) | 0] = Math.pow(Math.random(), 0.25);
+                            return harmonics;
+                        },
+                        (): number[] => {
+                            let current: number = 1.0;
+                            const harmonics: number[] = [current];
+                            for (let i = 1; i < Config.harmonicsControlPoints; i++) {
+                                current *= Math.pow(2, Math.random() - 0.55);
+                                harmonics[i] = current;
+                            }
+                            return harmonics;
+                        },
+                        (): number[] => {
+                            let current: number = 1.0;
+                            const harmonics: number[] = [current];
+                            for (let i = 1; i < Config.harmonicsControlPoints; i++) {
+                                current *= Math.pow(2, Math.random() - 0.55);
+                                harmonics[i] = current * Math.random();
+                            }
+                            return harmonics;
+                        },
+                    ];
+                    const generator = harmonicGenerators[(Math.random() * harmonicGenerators.length) | 0];
+                    const harmonics: number[] = generator();
+                    normalize(harmonics);
+                    for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
+                        instrument.harmonicsWave.harmonics[i] = Math.round(harmonics[i]);
+                    }
+                    instrument.harmonicsWave.markCustomWaveDirty();
+                } break;
+                case InstrumentType.spectrum: {
+                    const spectrum: number[] = [];
+                    for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
+                        const isHarmonic: boolean = i == 0 || i == 7 || i == 11 || i == 14 || i == 16 || i == 18 || i == 21;
+                        if (isHarmonic) {
+                            spectrum[i] = Math.pow(Math.random(), 0.25);
+                        } else {
+                            spectrum[i] = Math.pow(Math.random(), 3) * 0.5;
+                        }
+                    }
+                    normalize(spectrum);
+                    for (let i: number = 0; i < Config.spectrumControlPoints; i++) {
+                        instrument.spectrumWave.spectrum[i] = Math.round(spectrum[i]);
+                    }
+                    instrument.spectrumWave.markCustomWaveDirty();
+                } break;
+                case InstrumentType.fm: {
+                    instrument.algorithm = (Math.random() * Config.algorithms.length) | 0;
+                    instrument.feedbackType = (Math.random() * Config.feedbacks.length) | 0;
+                    const algorithm: Algorithm = Config.algorithms[instrument.algorithm];
+                    for (let i: number = 0; i < algorithm.carrierCount; i++) {
+                        instrument.operators[i].frequency = selectCurvedDistribution(1, Config.operatorFrequencies.length, 0, 3);
+                        instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 10 },
                             { item: "triangle", weight: 6 },
@@ -1538,10 +1530,10 @@ export class ChangeRandomGeneratedInstrument extends Change {
 								{ item: 9, weight: 3 },
 							]);
                         }
-					}
-					for (let i: number = algorithm.carrierCount; i < Config.operatorCount + (type == InstrumentType.fm6op? 2 : 0); i++) {
-						instrument.operators[i].frequency = selectCurvedDistribution(3, Config.operatorFrequencies.length - 1, 0, 3);
-						instrument.operators[i].amplitude = (Math.pow(Math.random(), 2) * Config.operatorAmplitudeMax) | 0;
+                    }
+                    for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
+                        instrument.operators[i].frequency = selectCurvedDistribution(4, Config.operatorFrequencies.length, 0, 3);
+                        instrument.operators[i].amplitude = (Math.pow(Math.random(), 2) * Config.operatorAmplitudeMax) | 0;
                         if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
                             instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorAmplitude"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
                             { item: "punch", weight: 2 },
