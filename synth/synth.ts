@@ -2437,7 +2437,7 @@ export class Channel {
 }
 
 export class Song {
-    private static readonly _format: string = "JummBox";
+    private static readonly _format: string = "Dogebox2";
     private static readonly _oldestBeepboxVersion: number = 2;
     private static readonly _latestBeepboxVersion: number = 9;
     private static readonly _oldestJummBoxVersion: number = 1;

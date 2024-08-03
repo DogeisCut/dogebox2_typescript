@@ -710,7 +710,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     instrument.feedbackType = (Math.random() * Config.feedbacks.length) | 0;
                     const algorithm: Algorithm = Config.algorithms[instrument.algorithm];
                     for (let i: number = 0; i < algorithm.carrierCount; i++) {
-                        instrument.operators[i].frequency = selectCurvedDistribution(0, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].frequency = selectCurvedDistribution(1, Config.operatorFrequencies.length, 0, 3);
                         instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
                         //TODO: HzOffset and Invert randomness
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
@@ -739,7 +739,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         }
                     }
                     for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
-                        instrument.operators[i].frequency = selectCurvedDistribution(3, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].frequency = selectCurvedDistribution(4, Config.operatorFrequencies.length, 0, 3);
                         instrument.operators[i].amplitude = (Math.pow(Math.random(), 2) * Config.operatorAmplitudeMax) | 0;
                         if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
                             instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorAmplitude"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
@@ -1072,7 +1072,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     instrument.feedbackType = (Math.random() * Config.feedbacks.length) | 0;
                     const algorithm: Algorithm = Config.algorithms[instrument.algorithm];
                     for (let i: number = 0; i < algorithm.carrierCount; i++) {
-                        instrument.operators[i].frequency = selectCurvedDistribution(0, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].frequency = selectCurvedDistribution(1, Config.operatorFrequencies.length, 0, 3);
                         instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 10 },
@@ -1099,7 +1099,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         }
                     }
                     for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
-                        instrument.operators[i].frequency = selectCurvedDistribution(3, Config.operatorFrequencies.length - 1, 0, 3);
+                        instrument.operators[i].frequency = selectCurvedDistribution(4, Config.operatorFrequencies.length, 0, 3);
                         instrument.operators[i].amplitude = (Math.pow(Math.random(), 2) * Config.operatorAmplitudeMax) | 0;
                         if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
                             instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorAmplitude"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
