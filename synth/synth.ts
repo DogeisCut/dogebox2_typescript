@@ -2608,7 +2608,7 @@ export class Instrument {
                         operator.pulseWidth = 5;
                     }
                 } if (instrumentObject["newOperators"] != undefined) { // New operators
-                    operatorObject = instrumentObject["operators"][j];
+                    operatorObject = instrumentObject["newOperators"][j];
                     if (operatorObject == undefined) operatorObject = {};
 
                     if (operatorObject["frequency"] != undefined) {
